@@ -28,8 +28,8 @@ import { Route as ClerkAuthenticatedRouteImport } from './routes/clerk/_authenti
 import { Route as ClerkauthRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedUsersIndexImport } from './routes/_authenticated/users/index'
-import { Route as AuthenticatedTasksIndexImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedProductsIndexImport } from './routes/_authenticated/products/index'
 import { Route as AuthenticatedHelpCenterIndexImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedChatsIndexImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedAppsIndexImport } from './routes/_authenticated/apps/index'
@@ -40,6 +40,10 @@ import { Route as AuthenticatedSettingsNotificationsImport } from './routes/_aut
 import { Route as AuthenticatedSettingsDisplayImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountImport } from './routes/_authenticated/settings/account'
+import { Route as AuthenticatedProductsListImport } from './routes/_authenticated/products/list'
+import { Route as AuthenticatedProductsDetailImport } from './routes/_authenticated/products/detail'
+import { Route as AuthenticatedProductsCreateImport } from './routes/_authenticated/products/create'
+import { Route as AuthenticatedProductsDetailProductIdImport } from './routes/_authenticated/products/detail/$productId'
 
 // Create/Update Routes
 
@@ -144,17 +148,19 @@ const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexImport.update({
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
-const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexImport.update({
-  id: '/tasks/',
-  path: '/tasks/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-
 const AuthenticatedSettingsIndexRoute = AuthenticatedSettingsIndexImport.update(
   {
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any,
+)
+
+const AuthenticatedProductsIndexRoute = AuthenticatedProductsIndexImport.update(
+  {
+    id: '/products/',
+    path: '/products/',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any,
 )
 
@@ -222,6 +228,33 @@ const AuthenticatedSettingsAccountRoute =
     id: '/account',
     path: '/account',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+
+const AuthenticatedProductsListRoute = AuthenticatedProductsListImport.update({
+  id: '/products/list',
+  path: '/products/list',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+
+const AuthenticatedProductsDetailRoute =
+  AuthenticatedProductsDetailImport.update({
+    id: '/products/detail',
+    path: '/products/detail',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
+const AuthenticatedProductsCreateRoute =
+  AuthenticatedProductsCreateImport.update({
+    id: '/products/create',
+    path: '/products/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
+const AuthenticatedProductsDetailProductIdRoute =
+  AuthenticatedProductsDetailProductIdImport.update({
+    id: '/$productId',
+    path: '/$productId',
+    getParentRoute: () => AuthenticatedProductsDetailRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -340,6 +373,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/products/create': {
+      id: '/_authenticated/products/create'
+      path: '/products/create'
+      fullPath: '/products/create'
+      preLoaderRoute: typeof AuthenticatedProductsCreateImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/products/detail': {
+      id: '/_authenticated/products/detail'
+      path: '/products/detail'
+      fullPath: '/products/detail'
+      preLoaderRoute: typeof AuthenticatedProductsDetailImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/products/list': {
+      id: '/_authenticated/products/list'
+      path: '/products/list'
+      fullPath: '/products/list'
+      preLoaderRoute: typeof AuthenticatedProductsListImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/settings/account': {
       id: '/_authenticated/settings/account'
       path: '/account'
@@ -410,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/products/': {
+      id: '/_authenticated/products/'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof AuthenticatedProductsIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/'
       path: '/'
@@ -417,19 +478,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexImport
       parentRoute: typeof AuthenticatedSettingsRouteImport
     }
-    '/_authenticated/tasks/': {
-      id: '/_authenticated/tasks/'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof AuthenticatedTasksIndexImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
     '/_authenticated/users/': {
       id: '/_authenticated/users/'
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof AuthenticatedUsersIndexImport
       parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/products/detail/$productId': {
+      id: '/_authenticated/products/detail/$productId'
+      path: '/$productId'
+      fullPath: '/products/detail/$productId'
+      preLoaderRoute: typeof AuthenticatedProductsDetailProductIdImport
+      parentRoute: typeof AuthenticatedProductsDetailImport
     }
   }
 }
@@ -459,23 +520,45 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
+interface AuthenticatedProductsDetailRouteChildren {
+  AuthenticatedProductsDetailProductIdRoute: typeof AuthenticatedProductsDetailProductIdRoute
+}
+
+const AuthenticatedProductsDetailRouteChildren: AuthenticatedProductsDetailRouteChildren =
+  {
+    AuthenticatedProductsDetailProductIdRoute:
+      AuthenticatedProductsDetailProductIdRoute,
+  }
+
+const AuthenticatedProductsDetailRouteWithChildren =
+  AuthenticatedProductsDetailRoute._addFileChildren(
+    AuthenticatedProductsDetailRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedProductsCreateRoute: typeof AuthenticatedProductsCreateRoute
+  AuthenticatedProductsDetailRoute: typeof AuthenticatedProductsDetailRouteWithChildren
+  AuthenticatedProductsListRoute: typeof AuthenticatedProductsListRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
-  AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
+  AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedProductsCreateRoute: AuthenticatedProductsCreateRoute,
+  AuthenticatedProductsDetailRoute:
+    AuthenticatedProductsDetailRouteWithChildren,
+  AuthenticatedProductsListRoute: AuthenticatedProductsListRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
-  AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
+  AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
 }
 
@@ -541,6 +624,9 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/products/create': typeof AuthenticatedProductsCreateRoute
+  '/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
+  '/products/list': typeof AuthenticatedProductsListRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
@@ -551,9 +637,10 @@ export interface FileRoutesByFullPath {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/products': typeof AuthenticatedProductsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/products/detail/$productId': typeof AuthenticatedProductsDetailProductIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -569,6 +656,9 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/products/create': typeof AuthenticatedProductsCreateRoute
+  '/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
+  '/products/list': typeof AuthenticatedProductsListRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
@@ -579,9 +669,10 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/products': typeof AuthenticatedProductsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
-  '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/products/detail/$productId': typeof AuthenticatedProductsDetailProductIdRoute
 }
 
 export interface FileRoutesById {
@@ -602,6 +693,9 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/products/create': typeof AuthenticatedProductsCreateRoute
+  '/_authenticated/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
+  '/_authenticated/products/list': typeof AuthenticatedProductsListRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
@@ -612,9 +706,10 @@ export interface FileRoutesById {
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/products/detail/$productId': typeof AuthenticatedProductsDetailProductIdRoute
 }
 
 export interface FileRouteTypes {
@@ -635,6 +730,9 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/products/create'
+    | '/products/detail'
+    | '/products/list'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
@@ -645,9 +743,10 @@ export interface FileRouteTypes {
     | '/apps'
     | '/chats'
     | '/help-center'
+    | '/products'
     | '/settings/'
-    | '/tasks'
     | '/users'
+    | '/products/detail/$productId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -662,6 +761,9 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/products/create'
+    | '/products/detail'
+    | '/products/list'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
@@ -672,9 +774,10 @@ export interface FileRouteTypes {
     | '/apps'
     | '/chats'
     | '/help-center'
+    | '/products'
     | '/settings'
-    | '/tasks'
     | '/users'
+    | '/products/detail/$productId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -693,6 +796,9 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/_authenticated/products/create'
+    | '/_authenticated/products/detail'
+    | '/_authenticated/products/list'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
@@ -703,9 +809,10 @@ export interface FileRouteTypes {
     | '/_authenticated/apps/'
     | '/_authenticated/chats/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/products/'
     | '/_authenticated/settings/'
-    | '/_authenticated/tasks/'
     | '/_authenticated/users/'
+    | '/_authenticated/products/detail/$productId'
   fileRoutesById: FileRoutesById
 }
 
@@ -768,10 +875,13 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/settings",
         "/_authenticated/",
+        "/_authenticated/products/create",
+        "/_authenticated/products/detail",
+        "/_authenticated/products/list",
         "/_authenticated/apps/",
         "/_authenticated/chats/",
         "/_authenticated/help-center/",
-        "/_authenticated/tasks/",
+        "/_authenticated/products/",
         "/_authenticated/users/"
       ]
     },
@@ -842,6 +952,21 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/index.tsx",
       "parent": "/_authenticated"
     },
+    "/_authenticated/products/create": {
+      "filePath": "_authenticated/products/create.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/products/detail": {
+      "filePath": "_authenticated/products/detail.tsx",
+      "parent": "/_authenticated",
+      "children": [
+        "/_authenticated/products/detail/$productId"
+      ]
+    },
+    "/_authenticated/products/list": {
+      "filePath": "_authenticated/products/list.tsx",
+      "parent": "/_authenticated"
+    },
     "/_authenticated/settings/account": {
       "filePath": "_authenticated/settings/account.tsx",
       "parent": "/_authenticated/settings"
@@ -882,17 +1007,21 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/help-center/index.tsx",
       "parent": "/_authenticated"
     },
+    "/_authenticated/products/": {
+      "filePath": "_authenticated/products/index.tsx",
+      "parent": "/_authenticated"
+    },
     "/_authenticated/settings/": {
       "filePath": "_authenticated/settings/index.tsx",
       "parent": "/_authenticated/settings"
     },
-    "/_authenticated/tasks/": {
-      "filePath": "_authenticated/tasks/index.tsx",
-      "parent": "/_authenticated"
-    },
     "/_authenticated/users/": {
       "filePath": "_authenticated/users/index.tsx",
       "parent": "/_authenticated"
+    },
+    "/_authenticated/products/detail/$productId": {
+      "filePath": "_authenticated/products/detail/$productId.tsx",
+      "parent": "/_authenticated/products/detail"
     }
   }
 }
