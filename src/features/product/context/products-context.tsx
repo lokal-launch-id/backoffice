@@ -17,28 +17,25 @@ interface ProductsContextType {
   error: Error | null
 }
 
-const ProductContext = React.createContext<ProductsContextType | null>(null)
+const ProductsContext = React.createContext<ProductsContextType | undefined>(
+  undefined
+)
 
-interface Props {
-  children: React.ReactNode
-}
-
-export default function ProductsProvider({ children }: Props) {
+export function ProductsProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<ProductsDialogType>(null)
   const [currentRow, setCurrentRow] = useState<Product | null>(null)
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null
   )
 
-  // Use the product hook to fetch data
   const {
     data: selectedProduct,
     isLoading: isLoadingProduct,
     error,
-  } = useProduct(selectedProductId)
+  } = useProduct(selectedProductId || '')
 
   return (
-    <ProductContext.Provider
+    <ProductsContext.Provider
       value={{
         open,
         setOpen,
@@ -48,21 +45,20 @@ export default function ProductsProvider({ children }: Props) {
         setSelectedProductId,
         selectedProduct: selectedProduct || null,
         isLoadingProduct,
-        error: error as Error | null,
+        error,
       }}
     >
       {children}
-    </ProductContext.Provider>
+    </ProductsContext.Provider>
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useProducts = () => {
-  const productsContext = React.useContext(ProductContext)
-
-  if (!productsContext) {
-    throw new Error('useProducts has to be used within <ProductContext>')
+export function useProducts() {
+  const context = React.useContext(ProductsContext)
+  if (context === undefined) {
+    throw new Error('useProducts must be used within a ProductsProvider')
   }
-
-  return productsContext
+  return context
 }
+
+export default ProductsProvider

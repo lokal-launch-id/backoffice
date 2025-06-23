@@ -1,9 +1,4 @@
-import {
-  IconShield,
-  IconUserShield,
-  IconUsersGroup,
-  IconCash,
-} from '@tabler/icons-react'
+import { IconShield, IconUserShield, IconUsersGroup } from '@tabler/icons-react'
 import { ProductStatus } from './schema'
 
 export const callTypes = new Map<ProductStatus, string>([
@@ -13,10 +8,6 @@ export const callTypes = new Map<ProductStatus, string>([
   ],
   ['pending', 'bg-neutral-300/40 border-neutral-300'],
   ['rejected', 'bg-sky-200/40 text-sky-900 dark:text-sky-100 border-sky-300'],
-  [
-    'suspended',
-    'bg-destructive/10 dark:bg-destructive/50 text-destructive dark:text-primary border-destructive/10',
-  ],
 ])
 
 export const productStatus = [
@@ -34,10 +25,5 @@ export const productStatus = [
     label: 'Rejected',
     value: 'rejected',
     icon: IconUsersGroup,
-  },
-  {
-    label: 'Suspended',
-    value: 'suspended',
-    icon: IconCash,
   },
 ] as const

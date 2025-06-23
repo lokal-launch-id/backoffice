@@ -7,21 +7,43 @@ export const productStatusSchema = z.union([
 ])
 export type ProductStatus = z.infer<typeof productStatusSchema>
 
-// const userSchema = z.object({
-//   id: z.string(),
-//   firstName: z.string(),
-//   lastName: z.string(),
-//   username: z.string(),
-//   email: z.string(),
-//   phoneNumber: z.string(),
-//   status: productStatusSchema,
-//   role: userRoleSchema,
-//   createdAt: z.coerce.date(),
-//   updatedAt: z.coerce.date(),
-// })
-// export type User = z.infer<typeof userSchema>
+export const productFormSchema = z.object({
+  name_en: z.string().min(1, { message: 'Name (EN) is required.' }),
+  name_id: z.string().min(1, { message: 'Name (ID) is required.' }),
+  tagline: z.string().min(1, { message: 'Tagline is required.' }),
+  description_en: z
+    .string()
+    .min(1, { message: 'Description (EN) is required.' }),
+  description_id: z
+    .string()
+    .min(1, { message: 'Description (ID) is required.' }),
+  website_url: z.string().url({ message: 'Please enter a valid URL.' }),
+  status: productStatusSchema,
+  is_featured: z.boolean(),
+  features: z.array(z.string()),
+  tech_stack: z.array(z.string()),
+  pricing: z.string().optional(),
+  images: z.array(
+    z.object({
+      id: z.string(),
+      product_id: z.string(),
+      image_url: z.string(),
+      order_index: z.number(),
+      created_at: z.string(),
+    })
+  ),
+})
+
+export type ProductFormData = z.infer<typeof productFormSchema>
 
 // export const userListSchema = z.array(userSchema)
+export type ProductImage = {
+  id: string
+  product_id: string
+  image_url: string
+  order_index: number
+  created_at: string
+}
 
 export interface Product {
   id: string
@@ -60,5 +82,5 @@ export interface Product {
   pricing: string
   user_clapped: boolean
   user_claps: number
-  images?: string[]
+  images?: ProductImage[]
 }

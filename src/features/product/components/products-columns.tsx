@@ -1,8 +1,6 @@
 import { format } from 'date-fns'
 import { Link } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
-import { getProduct } from '@/features/product/api/products-api'
-import { useProduct } from '@/features/product/hooks/use-products'
 import { useProducts } from '../context/products-context'
 import { Product } from '../data/schema'
 

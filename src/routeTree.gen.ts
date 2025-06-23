@@ -43,6 +43,7 @@ import { Route as AuthenticatedSettingsAccountImport } from './routes/_authentic
 import { Route as AuthenticatedProductsListImport } from './routes/_authenticated/products/list'
 import { Route as AuthenticatedProductsDetailImport } from './routes/_authenticated/products/detail'
 import { Route as AuthenticatedProductsCreateImport } from './routes/_authenticated/products/create'
+import { Route as AuthenticatedProductsEditProductIdImport } from './routes/_authenticated/products/edit/$productId'
 import { Route as AuthenticatedProductsDetailProductIdImport } from './routes/_authenticated/products/detail/$productId'
 
 // Create/Update Routes
@@ -247,6 +248,13 @@ const AuthenticatedProductsCreateRoute =
   AuthenticatedProductsCreateImport.update({
     id: '/products/create',
     path: '/products/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
+const AuthenticatedProductsEditProductIdRoute =
+  AuthenticatedProductsEditProductIdImport.update({
+    id: '/products/edit/$productId',
+    path: '/products/edit/$productId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -492,6 +500,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProductsDetailProductIdImport
       parentRoute: typeof AuthenticatedProductsDetailImport
     }
+    '/_authenticated/products/edit/$productId': {
+      id: '/_authenticated/products/edit/$productId'
+      path: '/products/edit/$productId'
+      fullPath: '/products/edit/$productId'
+      preLoaderRoute: typeof AuthenticatedProductsEditProductIdImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
   }
 }
 
@@ -546,6 +561,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedProductsEditProductIdRoute: typeof AuthenticatedProductsEditProductIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -560,6 +576,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedProductsEditProductIdRoute:
+    AuthenticatedProductsEditProductIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -641,6 +659,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/products/detail/$productId': typeof AuthenticatedProductsDetailProductIdRoute
+  '/products/edit/$productId': typeof AuthenticatedProductsEditProductIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -673,6 +692,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/products/detail/$productId': typeof AuthenticatedProductsDetailProductIdRoute
+  '/products/edit/$productId': typeof AuthenticatedProductsEditProductIdRoute
 }
 
 export interface FileRoutesById {
@@ -710,6 +730,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/products/detail/$productId': typeof AuthenticatedProductsDetailProductIdRoute
+  '/_authenticated/products/edit/$productId': typeof AuthenticatedProductsEditProductIdRoute
 }
 
 export interface FileRouteTypes {
@@ -747,6 +768,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/users'
     | '/products/detail/$productId'
+    | '/products/edit/$productId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -778,6 +800,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/products/detail/$productId'
+    | '/products/edit/$productId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -813,6 +836,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
     | '/_authenticated/products/detail/$productId'
+    | '/_authenticated/products/edit/$productId'
   fileRoutesById: FileRoutesById
 }
 
@@ -882,7 +906,8 @@ export const routeTree = rootRoute
         "/_authenticated/chats/",
         "/_authenticated/help-center/",
         "/_authenticated/products/",
-        "/_authenticated/users/"
+        "/_authenticated/users/",
+        "/_authenticated/products/edit/$productId"
       ]
     },
     "/clerk": {
@@ -1022,6 +1047,10 @@ export const routeTree = rootRoute
     "/_authenticated/products/detail/$productId": {
       "filePath": "_authenticated/products/detail/$productId.tsx",
       "parent": "/_authenticated/products/detail"
+    },
+    "/_authenticated/products/edit/$productId": {
+      "filePath": "_authenticated/products/edit/$productId.tsx",
+      "parent": "/_authenticated"
     }
   }
 }

@@ -6,7 +6,6 @@ import {
   updateProduct,
   deleteProduct,
   PaginationParams,
-  ProductsResponse,
 } from '../api/products-api'
 import { Product } from '../data/schema'
 
@@ -20,7 +19,6 @@ export const productKeys = {
   detail: (id: string) => [...productKeys.details(), id] as const,
 }
 
-// Hook for fetching all products with pagination
 export const useProducts = (
   filters?: string,
   pagination?: PaginationParams
@@ -28,19 +26,15 @@ export const useProducts = (
   return useQuery({
     queryKey: productKeys.list(filters || '', pagination),
     queryFn: () => getProducts(pagination),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
   })
 }
 
 // Hook for fetching a single product
-export const useProduct = (id: string | null) => {
+export const useProduct = (id: string) => {
   return useQuery({
-    queryKey: productKeys.detail(id!),
-    queryFn: () => getProduct(id!),
+    queryKey: productKeys.detail(id),
+    queryFn: () => getProduct(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
   })
 }
 

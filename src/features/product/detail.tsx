@@ -1,13 +1,13 @@
 import React from 'react'
 import { useParams } from '@tanstack/react-router'
+import { showSubmittedData } from '@/utils/show-submitted-data'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { ProductDetailHeader } from './components/product-detail-header'
 import { ProductDialogs } from './components/product-dialogs'
-import { ProductPrimaryButtons } from './components/product-primary-buttons'
+import { ProductForm } from './components/product-form'
 import ProductsProvider from './context/products-context'
 import { useProducts } from './context/products-context'
 
@@ -24,6 +24,23 @@ function ProductsDetailContent() {
       setSelectedProductId(productId)
     }
   }, [productId, setSelectedProductId])
+
+  const handleFormSubmit = (data: {
+    name_en: string
+    name_id: string
+    tagline: string
+    description_en: string
+    description_id: string
+    website_url: string
+    status: 'approved' | 'pending' | 'rejected'
+    is_featured: boolean
+    features: string[]
+    tech_stack: string[]
+    pricing?: string
+    images: string[]
+  }) => {
+    showSubmittedData(data, 'Product updated successfully:')
+  }
 
   if (isLoadingProduct) {
     return (
@@ -67,10 +84,13 @@ function ProductsDetailContent() {
               Product Detail
             </h2>
           </div>
-          <ProductPrimaryButtons type='edit' />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
-          <ProductDetailHeader product={selectedProduct} />
+          <ProductForm
+            product={selectedProduct}
+            isEditing={false}
+            onSubmit={handleFormSubmit}
+          />
         </div>
       </Main>
       <ProductDialogs />
