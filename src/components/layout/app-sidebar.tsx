@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/authStore'
 import {
   Sidebar,
   SidebarContent,
@@ -11,6 +12,13 @@ import { TeamSwitcher } from '@/components/layout/team-switcher'
 import { sidebarData } from './data/sidebar-data'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = useAuthStore((state) => state.user)
+  const userData = {
+    name: user?.first_name || '' + ' ' + user?.last_name || '',
+    email: user?.email || '',
+    avatar: user?.avatar_url || '',
+  }
+
   return (
     <Sidebar collapsible='icon' variant='floating' {...props}>
       <SidebarHeader>
@@ -22,7 +30,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={sidebarData.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -1,10 +1,12 @@
-import { HTMLAttributes, useState } from 'react'
+import { HTMLAttributes, useCallback, useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
-import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
+import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/features/auth/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -36,6 +38,8 @@ const formSchema = z.object({
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const { login } = useAuth()
+  const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,15 +49,20 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    // eslint-disable-next-line no-console
-    console.log(data)
-
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
-  }
+  const onSubmit = useCallback(
+    async (data: z.infer<typeof formSchema>) => {
+      setIsLoading(true)
+      try {
+        await login(data.email, data.password)
+        navigate({ to: '/' })
+      } catch (error) {
+        toast.error('Login error: ' + error)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [login, navigate]
+  )
 
   return (
     <Form {...form}>
@@ -98,7 +107,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           Login
         </Button>
 
-        <div className='relative my-2'>
+        {/* <div className='relative my-2'>
           <div className='absolute inset-0 flex items-center'>
             <span className='w-full border-t' />
           </div>
@@ -116,7 +125,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           <Button variant='outline' type='button' disabled={isLoading}>
             <IconBrandFacebook className='h-4 w-4' /> Facebook
           </Button>
-        </div>
+        </div> */}
       </form>
     </Form>
   )

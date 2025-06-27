@@ -29,13 +29,12 @@ export const API_ENDPOINTS = {
   },
   // Auth
   auth: {
-    login: '/auth/login',
-    logout: '/auth/logout',
-    refresh: '/auth/refresh',
+    login: '/login',
+    logout: '/logout',
+    refresh: '/refresh',
   },
 } as const
 
-// Helper function to build full URL
 export const buildApiUrl = (endpoint: string): string => {
   return `${config.baseUrl}${endpoint}`
 }
@@ -48,15 +47,51 @@ export class ApiClient {
     this.baseUrl = config.baseUrl
   }
 
+  // Get access token from localStorage
+  getAccessToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('accessToken')
+    }
+    return null
+  }
+
+  // Set access token in localStorage
+  setAccessToken(token: string): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('accessToken', token)
+    }
+  }
+
+  // Remove access token from localStorage
+  removeAccessToken(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken')
+    }
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
 
-    const defaultHeaders = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+    }
+
+    // Add custom headers if provided
+    if (options.headers) {
+      Object.entries(options.headers).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          headers[key] = value
+        }
+      })
+    }
+
+    // Add authorization header if token exists
+    const token = this.getAccessToken()
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
     }
 
     // Add delay in development if configured
@@ -66,10 +101,16 @@ export class ApiClient {
 
     const response = await fetch(url, {
       ...options,
-      headers: defaultHeaders,
+      headers,
     })
 
     if (!response.ok) {
+      // Handle 401 Unauthorized - clear token and redirect to login
+      if (response.status === 401) {
+        this.removeAccessToken()
+        // You might want to trigger a redirect to login here
+        // window.location.href = '/login'
+      }
       throw new Error(`API Error: ${response.status} ${response.statusText}`)
     }
 
@@ -82,7 +123,7 @@ export class ApiClient {
   }
 
   // POST request
-  async post<T>(endpoint: string, data?: any): Promise<T> {
+  async post<T>(endpoint: string, data?: Record<string, unknown>): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
@@ -90,7 +131,7 @@ export class ApiClient {
   }
 
   // PUT request
-  async put<T>(endpoint: string, data?: any): Promise<T> {
+  async put<T>(endpoint: string, data?: Record<string, unknown>): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,

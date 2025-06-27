@@ -15,11 +15,6 @@ import { Command } from 'lucide-react'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
-  user: {
-    name: 'davita',
-    email: 'dav@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
   teams: [
     {
       name: 'Lokal Lauch ID',
