@@ -41,11 +41,19 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
   getCurrentUser: () => Promise<void>
+
+  // Initialize auth state (call this on app startup)
+  initialize: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>()((set, get) => {
   const cookieState = Cookies.get('token')
   const initToken = cookieState ? JSON.parse(cookieState) : ''
+
+  // Initialize API client with token if it exists
+  if (initToken) {
+    apiClient.setAccessToken(initToken)
+  }
 
   return {
     // Initial state
@@ -116,7 +124,7 @@ export const useAuthStore = create<AuthState>()((set, get) => {
 
       set({ isLoading: true, error: null })
       try {
-        const user = await apiClient.get<AuthUser>('/profile')
+        const user = await apiClient.get<AuthUser>('/users/me')
         get().setUser(user)
         set({ isLoading: false })
       } catch (error) {
@@ -130,6 +138,14 @@ export const useAuthStore = create<AuthState>()((set, get) => {
               error instanceof Error ? error : new Error('Failed to get user'),
           })
         }
+      }
+    },
+
+    // Initialize auth state (call this on app startup)
+    initialize: async () => {
+      const { accessToken } = get()
+      if (accessToken && !get().user) {
+        await get().getCurrentUser()
       }
     },
   }

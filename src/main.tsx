@@ -16,6 +16,9 @@ import './index.css'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
 
+// Initialize auth store
+useAuthStore.getState().initialize()
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
