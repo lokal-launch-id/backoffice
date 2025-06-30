@@ -3,6 +3,7 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useUsers } from '@/stores/usersStore'
 import { showSubmittedData } from '@/utils/show-submitted-data'
 import { Button } from '@/components/ui/button'
 import {
@@ -29,10 +30,9 @@ import { User } from '../data/schema'
 
 const formSchema = z
   .object({
-    firstName: z.string().min(1, { message: 'First Name is required.' }),
-    lastName: z.string().min(1, { message: 'Last Name is required.' }),
+    first_name: z.string().min(1, { message: 'First Name is required.' }),
+    last_name: z.string().min(1, { message: 'Last Name is required.' }),
     username: z.string().min(1, { message: 'Username is required.' }),
-    phoneNumber: z.string().min(1, { message: 'Phone number is required.' }),
     email: z
       .string()
       .min(1, { message: 'Email is required.' })
@@ -93,7 +93,9 @@ interface Props {
   onOpenChange: (open: boolean) => void
 }
 
-export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
+export function UsersActionDialog({ currentRow, open }: Props) {
+  const { createUser, updateUser, setOpenDialog } = useUsers()
+
   const isEdit = !!currentRow
   const form = useForm<UserForm>({
     resolver: zodResolver(formSchema),
@@ -105,22 +107,45 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
           isEdit,
         }
       : {
-          firstName: '',
-          lastName: '',
+          first_name: '',
+          last_name: '',
           username: '',
           email: '',
           role: '',
-          phoneNumber: '',
           password: '',
           confirmPassword: '',
           isEdit,
         },
   })
 
-  const onSubmit = (values: UserForm) => {
-    form.reset()
-    showSubmittedData(values)
-    onOpenChange(false)
+  const onSubmit = async (values: UserForm) => {
+    try {
+      if (isEdit && currentRow) {
+        await updateUser(currentRow.id, {
+          first_name: values.first_name,
+          last_name: values.last_name,
+          username: values.username,
+          email: values.email,
+          role: values.role,
+        })
+        showSubmittedData(values, 'User updated successfully:')
+      } else {
+        await createUser({
+          first_name: values.first_name,
+          last_name: values.last_name,
+          username: values.username,
+          email: values.email,
+          password: values.password,
+          role: values.role,
+        })
+        showSubmittedData(values, 'User created successfully:')
+      }
+      form.reset()
+      setOpenDialog(null)
+    } catch (error) {
+      // Error is handled by the store
+      console.error('Failed to save user:', error)
+    }
   }
 
   const isPasswordTouched = !!form.formState.dirtyFields.password
@@ -128,9 +153,9 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
   return (
     <Dialog
       open={open}
-      onOpenChange={(state) => {
+      onOpenChange={(_) => {
         form.reset()
-        onOpenChange(state)
+        setOpenDialog(null)
       }}
     >
       <DialogContent className='sm:max-w-lg'>
@@ -150,7 +175,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
             >
               <FormField
                 control={form.control}
-                name='firstName'
+                name='first_name'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-right'>
@@ -170,7 +195,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
               />
               <FormField
                 control={form.control}
-                name='lastName'
+                name='last_name'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-right'>
@@ -198,8 +223,9 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='john_doe'
+                        placeholder='johndoe'
                         className='col-span-4'
+                        autoComplete='off'
                         {...field}
                       />
                     </FormControl>
@@ -217,27 +243,9 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='john.doe@gmail.com'
+                        placeholder='john@example.com'
                         className='col-span-4'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='phoneNumber'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-right'>
-                      Phone Number
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='+123456789'
-                        className='col-span-4'
+                        autoComplete='off'
                         {...field}
                       />
                     </FormControl>
@@ -253,65 +261,123 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                     <FormLabel className='col-span-2 text-right'>
                       Role
                     </FormLabel>
-                    <SelectDropdown
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
-                      placeholder='Select a role'
-                      className='col-span-4'
-                      items={userTypes.map(({ label, value }) => ({
-                        label,
-                        value,
-                      }))}
-                    />
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='password'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-right'>
-                      Password
-                    </FormLabel>
                     <FormControl>
-                      <PasswordInput
-                        placeholder='e.g., S3cur3P@ssw0rd'
+                      <SelectDropdown
+                        placeholder='Select role'
                         className='col-span-4'
-                        {...field}
+                        items={userTypes.map(({ label, value }) => ({
+                          label,
+                          value,
+                        }))}
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
                       />
                     </FormControl>
                     <FormMessage className='col-span-4 col-start-3' />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name='confirmPassword'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-right'>
-                      Confirm Password
-                    </FormLabel>
-                    <FormControl>
-                      <PasswordInput
-                        disabled={!isPasswordTouched}
-                        placeholder='e.g., S3cur3P@ssw0rd'
-                        className='col-span-4'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
+              {!isEdit && (
+                <FormField
+                  control={form.control}
+                  name='password'
+                  render={({ field }) => (
+                    <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                      <FormLabel className='col-span-2 text-right'>
+                        Password
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          placeholder='********'
+                          className='col-span-4'
+                          autoComplete='off'
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className='col-span-4 col-start-3' />
+                    </FormItem>
+                  )}
+                />
+              )}
+              {!isEdit && (
+                <FormField
+                  control={form.control}
+                  name='confirmPassword'
+                  render={({ field }) => (
+                    <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                      <FormLabel className='col-span-2 text-right'>
+                        Confirm Password
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          placeholder='********'
+                          className='col-span-4'
+                          autoComplete='off'
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className='col-span-4 col-start-3' />
+                    </FormItem>
+                  )}
+                />
+              )}
+              {isEdit && isPasswordTouched && (
+                <FormField
+                  control={form.control}
+                  name='password'
+                  render={({ field }) => (
+                    <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                      <FormLabel className='col-span-2 text-right'>
+                        New Password
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          placeholder='********'
+                          className='col-span-4'
+                          autoComplete='off'
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className='col-span-4 col-start-3' />
+                    </FormItem>
+                  )}
+                />
+              )}
+              {isEdit && isPasswordTouched && (
+                <FormField
+                  control={form.control}
+                  name='confirmPassword'
+                  render={({ field }) => (
+                    <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                      <FormLabel className='col-span-2 text-right'>
+                        Confirm New Password
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          placeholder='********'
+                          className='col-span-4'
+                          autoComplete='off'
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className='col-span-4 col-start-3' />
+                    </FormItem>
+                  )}
+                />
+              )}
             </form>
           </Form>
         </div>
         <DialogFooter>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => setOpenDialog(null)}
+          >
+            Cancel
+          </Button>
           <Button type='submit' form='user-form'>
-            Save changes
+            {isEdit ? 'Update' : 'Create'}
           </Button>
         </DialogFooter>
       </DialogContent>

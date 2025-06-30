@@ -10,7 +10,6 @@ import {
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
@@ -22,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { PaginationMeta } from '../api/users-api'
 import { User } from '../data/schema'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableToolbar } from './data-table-toolbar'
@@ -33,12 +33,21 @@ declare module '@tanstack/react-table' {
   }
 }
 
-interface DataTableProps {
+interface UsersTableProps {
   columns: ColumnDef<User>[]
   data: User[]
+  meta: PaginationMeta
+  onPageChange: (page: number) => void
+  onPageSizeChange: (pageSize: number) => void
 }
 
-export function UsersTable({ columns, data }: DataTableProps) {
+export function UsersTable({
+  columns,
+  data,
+  meta,
+  onPageChange,
+  onPageSizeChange,
+}: UsersTableProps) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -60,7 +69,6 @@ export function UsersTable({ columns, data }: DataTableProps) {
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -127,7 +135,12 @@ export function UsersTable({ columns, data }: DataTableProps) {
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination
+        meta={meta}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        selectedRows={table.getFilteredSelectedRowModel().rows.length}
+      />
     </div>
   )
 }

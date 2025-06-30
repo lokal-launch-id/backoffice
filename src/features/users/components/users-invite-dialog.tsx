@@ -2,11 +2,11 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconMailPlus, IconSend } from '@tabler/icons-react'
+import { useUsers } from '@/stores/usersStore'
 import { showSubmittedData } from '@/utils/show-submitted-data'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -42,15 +42,25 @@ interface Props {
 }
 
 export function UsersInviteDialog({ open, onOpenChange }: Props) {
+  const { inviteUser, setOpenDialog } = useUsers()
   const form = useForm<UserInviteForm>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '', role: '', desc: '' },
   })
 
-  const onSubmit = (values: UserInviteForm) => {
-    form.reset()
-    showSubmittedData(values)
-    onOpenChange(false)
+  const onSubmit = async (values: UserInviteForm) => {
+    try {
+      await inviteUser({
+        email: values.email,
+        role: values.role,
+        desc: values.desc,
+      })
+      showSubmittedData(values, 'User invited successfully:')
+      form.reset()
+      onOpenChange(false)
+    } catch (_error) {
+      // Error is handled by the store
+    }
   }
 
   return (
@@ -67,6 +77,8 @@ export function UsersInviteDialog({ open, onOpenChange }: Props) {
             <IconMailPlus /> Invite User
           </DialogTitle>
           <DialogDescription>
+            <strong>This feature is not yet implemented.</strong>
+            <br />
             Invite new user to join your team by sending them an email
             invitation. Assign a role to define their access level.
           </DialogDescription>
@@ -133,9 +145,15 @@ export function UsersInviteDialog({ open, onOpenChange }: Props) {
           </form>
         </Form>
         <DialogFooter className='gap-y-2'>
-          <DialogClose asChild>
-            <Button variant='outline'>Cancel</Button>
-          </DialogClose>
+          <Button
+            variant='outline'
+            onClick={() => {
+              form.reset()
+              setOpenDialog(null)
+            }}
+          >
+            Cancel
+          </Button>
           <Button type='submit' form='user-invite-form'>
             Invite <IconSend />
           </Button>

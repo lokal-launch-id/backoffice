@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { IconAlertTriangle } from '@tabler/icons-react'
+import { useUsers } from '@/stores/usersStore'
 import { showSubmittedData } from '@/utils/show-submitted-data'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
@@ -17,12 +18,19 @@ interface Props {
 
 export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
   const [value, setValue] = useState('')
+  const { deleteUser, fetchUsers } = useUsers()
 
-  const handleDelete = () => {
-    if (value.trim() !== currentRow.username) return
+  const handleDelete = async () => {
+    if (value == '' || value.trim() !== currentRow.email) return
 
-    onOpenChange(false)
-    showSubmittedData(currentRow, 'The following user has been deleted:')
+    try {
+      await deleteUser(currentRow.id)
+      showSubmittedData(currentRow, 'The following user has been deleted:')
+      onOpenChange(false)
+      fetchUsers()
+    } catch (error) {
+      console.error('Failed to delete user:', error)
+    }
   }
 
   return (
@@ -30,7 +38,7 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
       open={open}
       onOpenChange={onOpenChange}
       handleConfirm={handleDelete}
-      disabled={value.trim() !== currentRow.username}
+      disabled={value == '' || value.trim() !== currentRow.email}
       title={
         <span className='text-destructive'>
           <IconAlertTriangle
@@ -44,7 +52,7 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
         <div className='space-y-4'>
           <p className='mb-2'>
             Are you sure you want to delete{' '}
-            <span className='font-bold'>{currentRow.username}</span>?
+            <span className='font-bold'>{currentRow.email}</span>?
             <br />
             This action will permanently remove the user with the role of{' '}
             <span className='font-bold'>
@@ -54,18 +62,18 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
           </p>
 
           <Label className='my-2'>
-            Username:
+            Email:
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder='Enter username to confirm deletion.'
+              placeholder='Enter email to confirm deletion.'
             />
           </Label>
 
           <Alert variant='destructive'>
             <AlertTitle>Warning!</AlertTitle>
             <AlertDescription>
-              Please be carefull, this operation can not be rolled back.
+              This operation can not be rolled back.
             </AlertDescription>
           </Alert>
         </div>

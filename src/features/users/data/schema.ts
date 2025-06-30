@@ -1,32 +1,40 @@
-import { z } from 'zod'
-
-const userStatusSchema = z.union([
-  z.literal('active'),
-  z.literal('inactive'),
-  z.literal('invited'),
-  z.literal('suspended'),
-])
-export type UserStatus = z.infer<typeof userStatusSchema>
+import * as z from 'zod/v4'
 
 const userRoleSchema = z.union([
-  z.literal('superadmin'),
   z.literal('admin'),
-  z.literal('cashier'),
-  z.literal('manager'),
+  z.literal('moderator'),
+  z.literal('user'),
 ])
 
 const userSchema = z.object({
   id: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
   username: z.string(),
   email: z.string(),
-  phoneNumber: z.string(),
-  status: userStatusSchema,
+  first_name: z.string(),
+  last_name: z.string(),
+  bio: z.string().nullable(),
+  avatar_url: z.string().nullable(),
+  is_indonesian_maker: z.boolean(),
+  is_verified: z.boolean(),
   role: userRoleSchema,
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  created_at: z.iso.datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
 })
 export type User = z.infer<typeof userSchema>
 
 export const userListSchema = z.array(userSchema)
+
+// API response schema with pagination
+const paginationMetaSchema = z.object({
+  current_page: z.number(),
+  total_pages: z.number(),
+  total_items: z.number(),
+  items_per_page: z.number(),
+})
+
+export const userListResponseSchema = z.object({
+  data: userListSchema,
+  meta: paginationMetaSchema,
+})
+
+export type UserListResponse = z.infer<typeof userListResponseSchema>

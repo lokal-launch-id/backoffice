@@ -58,30 +58,6 @@ export const sidebarData: SidebarData = {
           url: '/apps',
           icon: IconPackages,
         },
-        // {
-        //   title: 'Chats',
-        //   url: '/chats',
-        //   badge: '3',
-        //   icon: IconMessages,
-        // },
-        // {
-        //   title: 'Secured by Clerk',
-        //   icon: ClerkLogo,
-        //   items: [
-        //     {
-        //       title: 'Sign In',
-        //       url: '/clerk/sign-in',
-        //     },
-        //     {
-        //       title: 'Sign Up',
-        //       url: '/clerk/sign-up',
-        //     },
-        //     {
-        //       title: 'User Management',
-        //       url: '/clerk/user-management',
-        //     },
-        //   ],
-        // },
       ],
     },
 
