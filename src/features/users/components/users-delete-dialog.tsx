@@ -28,9 +28,7 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
       showSubmittedData(currentRow, 'The following user has been deleted:')
       onOpenChange(false)
       fetchUsers()
-    } catch (error) {
-      console.error('Failed to delete user:', error)
-    }
+    } catch (error) {}
   }
 
   return (

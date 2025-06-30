@@ -142,10 +142,7 @@ export function UsersActionDialog({ currentRow, open }: Props) {
       }
       form.reset()
       setOpenDialog(null)
-    } catch (error) {
-      // Error is handled by the store
-      console.error('Failed to save user:', error)
-    }
+    } catch (_) {}
   }
 
   const isPasswordTouched = !!form.formState.dirtyFields.password
@@ -223,7 +220,7 @@ export function UsersActionDialog({ currentRow, open }: Props) {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='johndoe'
+                        placeholder='joahanna'
                         className='col-span-4'
                         autoComplete='off'
                         {...field}

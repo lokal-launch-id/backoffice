@@ -21,7 +21,6 @@ interface DataTableRowActionsProps {
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { setOpenDialog, setCurrentRow, resendVerificationEmail } = useUsers()
   const { user } = useAuth()
-  console.log(user, 'current user')
   return (
     <>
       <DropdownMenu modal={false}>

@@ -17,12 +17,9 @@ interface CreateUserData {
   role: string
 }
 
-interface UpdateUserData {
-  first_name?: string
-  last_name?: string
-  username?: string
-  email?: string
-  role?: string
+interface UpdateUserData extends Partial<User> {
+  password?: string
+  confirmPassword?: string
 }
 
 interface InviteUserData {
@@ -72,6 +69,7 @@ interface UsersState {
   updateUser: (id: string, userData: UpdateUserData) => Promise<void>
   deleteUser: (id: string) => Promise<void>
   inviteUser: (inviteData: InviteUserData) => Promise<void>
+  resendVerificationEmail: (email: string) => Promise<void>
 
   // Reset state
   reset: () => void
@@ -169,9 +167,9 @@ export const useUsersStore = create<UsersState>()((set, get) => ({
   updateUser: async (id: string, userData: UpdateUserData) => {
     set({ isLoading: true, error: null })
     try {
-      const updatedUser = await apiClient.put<User>(
-        API_ENDPOINTS.users.detail(id),
-        userData as unknown as Record<string, unknown>
+      const updatedUser = await apiClient.patch<User>(
+        API_ENDPOINTS.users.update(id),
+        userData as Record<string, unknown>
       )
       const { users } = get()
       const updatedUsers = users.map((user) =>

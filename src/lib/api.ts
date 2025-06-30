@@ -22,6 +22,8 @@ export const API_ENDPOINTS = {
     detail: (id: string) => `/users/${id}`,
     profile: '/users/profile',
     delete: (id: string) => `/admin/users/${id}`,
+    update: (id: string) => `/users/${id}`,
+    updateOwn: '/users/me',
   },
   // Categories
   categories: {
@@ -152,10 +154,10 @@ export class ApiClient {
     })
   }
 
-  // PUT request
-  async put<T>(endpoint: string, data?: Record<string, unknown>): Promise<T> {
+  // PATCH request
+  async patch<T>(endpoint: string, data?: Record<string, unknown>): Promise<T> {
     return this.request<T>(endpoint, {
-      method: 'PUT',
+      method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
     })
   }
