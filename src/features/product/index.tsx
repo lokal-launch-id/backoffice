@@ -8,7 +8,6 @@ import { PaginationParams } from './api/products-api'
 import { ProductDialogs } from './components/product-dialogs'
 import { productsColumns } from './components/products-columns'
 import { ProductsTable } from './components/products-table'
-import ProductsProvider from './context/products-context'
 import { useProducts as useProductsQuery } from './hooks/use-products'
 
 export default function Products() {
@@ -28,7 +27,7 @@ export default function Products() {
   }
 
   return (
-    <ProductsProvider>
+    <>
       <Header fixed>
         <Search />
         <div className='ml-auto flex items-center space-x-4'>
@@ -65,6 +64,6 @@ export default function Products() {
         </div>
       </Main>
       <ProductDialogs />
-    </ProductsProvider>
+    </>
   )
 }

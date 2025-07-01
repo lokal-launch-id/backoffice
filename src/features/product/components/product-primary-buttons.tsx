@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { IconPlus, IconEdit } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
-import { useProducts } from '../context/products-context'
+import { useProducts } from '../stores/productsStore'
 
 interface ProductPrimaryButtonsProps {
   type?: 'add' | 'edit'

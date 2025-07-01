@@ -1,10 +1,15 @@
-
+import { useEffect } from 'react'
+import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { IconEdit, IconX } from '@tabler/icons-react'
+import { useAuthStore } from '@//stores/authStore'
+import { CalendarIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -18,6 +23,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -25,15 +35,27 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Product, ProductFormData, ProductImage } from '../data/schema'
+import {
+  Product,
+  ProductFormData,
+  ProductImage,
+  ProductStatus,
+  Category,
+} from '../data/schema'
 import { productFormSchema } from '../data/schema'
+import { EditableList } from './product-editable-list'
 
 // Form schema for product editing
 interface ProductFormProps {
   product: Product
   isEditing?: boolean
-  onSubmit?: (data: ProductFormData) => void
+  onSubmit?: (
+    data: ProductFormData & { category_id?: string; category?: Category }
+  ) => void
   onCancel?: () => void
+  categories?: Category[]
+  hideStatus?: boolean
+  isFromCreate?: boolean
 }
 
 export function ProductForm({
@@ -41,36 +63,60 @@ export function ProductForm({
   isEditing = false,
   onSubmit,
   onCancel,
+  categories = [],
+  hideStatus = false,
+  isFromCreate = false,
 }: ProductFormProps) {
   const navigate = useNavigate()
+  const user = useAuthStore((state) => state.user)
+
+  const getInitialValues = (): ProductFormData => ({
+    name_en: product.name_en,
+    name_id: product.name_id,
+    tagline: product.tagline,
+    description_en: product.description_en,
+    description_id: product.description_id,
+    website_url: product.website_url,
+    status: product.status,
+    is_featured: product.is_featured,
+    features: product.features || [],
+    tech_stack: product.tech_stack || [],
+    pricing: typeof product.pricing === 'string' ? product.pricing : undefined,
+    images:
+      (product.images as unknown as Partial<ProductImage>[])?.map((image) => ({
+        id: image.id || '',
+        product_id: image.product_id || product.id,
+        image_url: image.image_url || '',
+        order_index: image.order_index || 0,
+        created_at: image.created_at || new Date().toISOString(),
+      })) || [],
+    category_id: product.category_id,
+    category: product.category?.id || '',
+    launch_date:
+      product.launch_date && !isNaN(new Date(product.launch_date).getTime())
+        ? new Date(product.launch_date)
+        : undefined,
+  })
+
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
-    defaultValues: {
-      name_en: product.name_en,
-      name_id: product.name_id,
-      tagline: product.tagline,
-      description_en: product.description_en,
-      description_id: product.description_id,
-      website_url: product.website_url,
-      status: product.status,
-      is_featured: product.is_featured,
-      features: product.features || [],
-      tech_stack: product.tech_stack || [],
-      pricing: product.pricing,
-      images:
-        (product.images as unknown as ProductImage[])?.map((image) => ({
-          id: image.id,
-          product_id: image.product_id,
-          image_url: image.image_url,
-          order_index: image.order_index,
-          created_at: image.created_at,
-        })) || [],
-    },
+    defaultValues: getInitialValues(),
   })
+
+  // Reset form when product changes OR when entering edit mode
+  useEffect(() => {
+    const initialValues = getInitialValues()
+    form.reset(initialValues)
+  }, [product, isEditing])
 
   const handleSubmit = (data: ProductFormData) => {
     if (onSubmit) {
-      onSubmit(data)
+      onSubmit({
+        ...data,
+        launch_date: data.launch_date
+          ? format(data.launch_date, 'yyyy-MM-dd')
+          : undefined,
+      } as ProductFormData & { category_id?: string; category?: Category })
     }
   }
 
@@ -79,6 +125,13 @@ export function ProductForm({
       to: '/products/edit/$productId',
       params: { productId: product.id },
     })
+  }
+
+  const handleCancel = () => {
+    form.reset(getInitialValues())
+    if (onCancel) {
+      onCancel()
+    }
   }
 
   const handleRemoveImage = (index: number) => {
@@ -108,8 +161,15 @@ export function ProductForm({
     }
   }
 
-  const userName =
-    product.user.first_name || product.user.last_name
+  const getAdminUser = () => {
+    return user?.first_name || user?.last_name
+      ? `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim()
+      : ''
+  }
+
+  const userName = isFromCreate
+    ? getAdminUser()
+    : product.user.first_name || product.user.last_name
       ? `${product.user.first_name ?? ''} ${product.user.last_name ?? ''}`.trim()
       : product.user.username
 
@@ -118,7 +178,7 @@ export function ProductForm({
       <CardHeader className='flex flex-row items-center justify-between gap-4'>
         <div className='flex items-center gap-4'>
           <Avatar>
-            <AvatarImage src={product.user.avatar_url} />
+            <AvatarImage src={product.user.avatar_url ?? ''} />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
           <div>
@@ -263,7 +323,94 @@ export function ProductForm({
               )}
             />
 
-            <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
+            {/* Launch Date */}
+            <FormField
+              control={form.control}
+              name='launch_date'
+              render={({ field }) => (
+                <FormItem className='flex flex-col'>
+                  <FormLabel>Launch Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          disabled={!isEditing}
+                          variant={'outline'}
+                          className={cn(
+                            'w-[240px] pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, 'PPP')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0' align='start'>
+                      <Calendar
+                        mode='single'
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date: Date) =>
+                          date < new Date() ||
+                          date >
+                            new Date(
+                              new Date().setFullYear(
+                                new Date().getFullYear() + 4
+                              )
+                            )
+                        }
+                        captionLayout='dropdown'
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Category Select */}
+            {isEditing && categories.length > 0 && (
+              <FormField
+                control={form.control}
+                name='category_id'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select
+                      value={field.value || ''}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                        const cat = categories.find((c) => c.id === value)
+                        form.setValue('category', cat?.id || '')
+                      }}
+                      disabled={!isEditing}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select category' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name_en} {cat.icon_url}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {/* Hide status if hideStatus is true */}
+            {!hideStatus && (
               <FormField
                 control={form.control}
                 name='status'
@@ -271,8 +418,10 @@ export function ProductForm({
                   <FormItem>
                     <FormLabel>Status</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value as ProductStatus)
+                      }}
+                      value={field.value ?? ''}
                       disabled={!isEditing}
                     >
                       <FormControl>
@@ -290,25 +439,26 @@ export function ProductForm({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name='is_featured'
-                render={({ field }) => (
-                  <FormItem className='flex flex-row items-start space-y-0 space-x-3'>
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={!isEditing}
-                      />
-                    </FormControl>
-                    <div className='space-y-1 leading-none'>
-                      <FormLabel>Featured Product</FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </div>
+            )}
+
+            <FormField
+              control={form.control}
+              name='is_featured'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-start space-y-0 space-x-3'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={!isEditing}
+                    />
+                  </FormControl>
+                  <div className='space-y-1 leading-none'>
+                    <FormLabel>Featured Product</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -334,18 +484,21 @@ export function ProductForm({
                 <div className='mb-2 leading-none'>
                   <FormLabel>Product ID</FormLabel>
                 </div>
-                <Input value={product.id} disabled className='bg-muted' />
+                <Input value={product.id ?? ''} disabled className='bg-muted' />
               </div>
-              <div>
-                <div className='mb-2 leading-none'>
-                  <FormLabel>Category</FormLabel>
+
+              {!isFromCreate && (
+                <div>
+                  <div className='mb-2 leading-none'>
+                    <FormLabel>Category</FormLabel>
+                  </div>
+                  <Input
+                    value={`${product.category.name_en ?? ''}  ${product.category.icon_url ?? ''}`}
+                    disabled
+                    className='bg-muted'
+                  />
                 </div>
-                <Input
-                  value={`${product.category.name_en}  ${product.category.icon_url}`}
-                  disabled
-                  className='bg-muted'
-                />
-              </div>
+              )}
             </div>
 
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
@@ -354,7 +507,11 @@ export function ProductForm({
                   <FormLabel>Total Claps</FormLabel>
                 </div>
                 <Input
-                  value={product.total_claps.toString()}
+                  value={
+                    product.total_claps != null
+                      ? product.total_claps.toString()
+                      : ''
+                  }
                   disabled
                   className='bg-muted'
                 />
@@ -364,7 +521,11 @@ export function ProductForm({
                   <FormLabel>Total Comments</FormLabel>
                 </div>
                 <Input
-                  value={product.total_comments.toString()}
+                  value={
+                    product.total_comments != null
+                      ? product.total_comments.toString()
+                      : ''
+                  }
                   disabled
                   className='bg-muted'
                 />
@@ -377,7 +538,7 @@ export function ProductForm({
                   <FormLabel>Created At</FormLabel>
                 </div>
                 <Input
-                  value={product.created_at}
+                  value={product.created_at ?? ''}
                   disabled
                   className='bg-muted'
                 />
@@ -387,52 +548,48 @@ export function ProductForm({
                   <FormLabel>Updated At</FormLabel>
                 </div>
                 <Input
-                  value={product.updated_at}
+                  value={product.updated_at ?? ''}
                   disabled
                   className='bg-muted'
                 />
               </div>
             </div>
 
-            {/* Features and Tech Stack */}
-            <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
-              <div>
-                <div className='mb-2 leading-none'>
-                  <FormLabel>Features</FormLabel>
-                </div>
-                {product.features && product.features.length > 0 ? (
-                  <ul className='list-inside list-disc space-y-1'>
-                    {product.features.map((feature, idx) => (
-                      <li key={idx} className='text-sm'>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span className='text-muted-foreground text-sm'>
-                    No features listed
-                  </span>
-                )}
-              </div>
-              <div>
-                <div className='mb-2 leading-none'>
-                  <FormLabel>Tech Stack</FormLabel>
-                </div>
-                {product.tech_stack && product.tech_stack.length > 0 ? (
-                  <ul className='list-inside list-disc space-y-1'>
-                    {product.tech_stack.map((tech, idx) => (
-                      <li key={idx} className='text-sm'>
-                        {tech}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span className='text-muted-foreground text-sm'>
-                    No tech stack listed
-                  </span>
-                )}
-              </div>
-            </div>
+            {/* Features Editable List */}
+            <FormField
+              control={form.control}
+              name='features'
+              render={({ field }) => (
+                <FormItem>
+                  <EditableList
+                    label='Features'
+                    items={field.value || []}
+                    onChange={field.onChange}
+                    isEditing={isEditing}
+                    inputPlaceholder='Add feature'
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Tech Stack Editable List */}
+            <FormField
+              control={form.control}
+              name='tech_stack'
+              render={({ field }) => (
+                <FormItem>
+                  <EditableList
+                    label='Tech Stack'
+                    items={field.value || []}
+                    onChange={field.onChange}
+                    isEditing={isEditing}
+                    inputPlaceholder='Add tech'
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Images */}
             <div>
@@ -483,8 +640,15 @@ export function ProductForm({
                       className='cursor-pointer'
                     />
                     <p className='text-muted-foreground text-sm'>
-                      Select one or more images to upload. New images will be
-                      added to existing ones.
+                      <br />
+                      Rules:
+                      <br />
+                      1) First image will be used as the product logo.
+                      <br />
+                      2) Upload three more images at most.
+                      <br />
+                      3) Delete existing images with the red button if you want
+                      to replace them.
                     </p>
                   </div>
                 </div>
@@ -494,7 +658,7 @@ export function ProductForm({
             {/* Action Buttons */}
             {isEditing && (
               <div className='flex justify-end space-x-2'>
-                <Button type='button' variant='outline' onClick={onCancel}>
+                <Button type='button' variant='outline' onClick={handleCancel}>
                   Cancel
                 </Button>
                 <Button type='submit'>Save Changes</Button>

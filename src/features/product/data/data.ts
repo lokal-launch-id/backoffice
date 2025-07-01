@@ -1,4 +1,5 @@
 import { IconShield, IconUserShield, IconUsersGroup } from '@tabler/icons-react'
+import { User } from '@/features/users/data/schema'
 import { ProductStatus } from './schema'
 
 export const callTypes = new Map<ProductStatus, string>([

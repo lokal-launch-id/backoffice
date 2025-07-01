@@ -1,8 +1,8 @@
 import { format } from 'date-fns'
 import { Link } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
-import { useProducts } from '../context/products-context'
 import { Product } from '../data/schema'
+import { useProducts } from '../stores/productsStore'
 
 // Separate component to use React hooks
 function ProductNameCell({ product }: { product: Product }) {

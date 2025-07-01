@@ -1,22 +1,24 @@
 import React from 'react'
-import { useParams } from '@tanstack/react-router'
-import { showSubmittedData } from '@/utils/show-submitted-data'
+import { useParams, useNavigate } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { ProductDialogs } from './components/product-dialogs'
-import { ProductForm } from './components/product-form'
-import ProductsProvider from './context/products-context'
-import { useProducts } from './context/products-context'
+import { ProductImage } from '../data/schema'
+import { useUpdateProduct } from '../hooks/use-products'
+import { useProducts } from '../stores/productsStore'
+import { ProductDialogs } from './product-dialogs'
+import { ProductForm } from './product-form'
 
-function ProductsDetailContent() {
+function ProductsEditContent() {
   const { productId } = useParams({
-    from: '/_authenticated/products/detail/$productId',
+    from: '/_authenticated/products/edit/$productId',
   })
+  const navigate = useNavigate()
   const { selectedProduct, isLoadingProduct, error, setSelectedProductId } =
     useProducts()
+  const updateProductMutation = useUpdateProduct()
 
   // Set the selected product ID when component mounts
   React.useEffect(() => {
@@ -25,7 +27,7 @@ function ProductsDetailContent() {
     }
   }, [productId, setSelectedProductId])
 
-  const handleFormSubmit = (data: {
+  const handleFormSubmit = async (data: {
     name_en: string
     name_id: string
     tagline: string
@@ -37,9 +39,20 @@ function ProductsDetailContent() {
     features: string[]
     tech_stack: string[]
     pricing?: string
-    images: string[]
+    images: ProductImage[]
   }) => {
-    showSubmittedData(data, 'Product updated successfully:')
+    if (!selectedProduct) return
+    try {
+      await updateProductMutation.mutateAsync({ id: selectedProduct.id, data })
+      navigate({ to: '/products/detail/$productId', params: { productId } })
+    } catch (_) {
+      // Handle error if needed
+    }
+  }
+
+  const handleCancel = () => {
+    // Navigate back to detail page
+    navigate({ to: '/products/detail/$productId', params: { productId } })
   }
 
   if (isLoadingProduct) {
@@ -80,16 +93,15 @@ function ProductsDetailContent() {
       <Main>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>
-              Product Detail
-            </h2>
+            <h2 className='text-2xl font-bold tracking-tight'>Edit Product</h2>
           </div>
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
           <ProductForm
             product={selectedProduct}
-            isEditing={false}
+            isEditing={true}
             onSubmit={handleFormSubmit}
+            onCancel={handleCancel}
           />
         </div>
       </Main>
@@ -98,10 +110,6 @@ function ProductsDetailContent() {
   )
 }
 
-export default function ProductsDetail() {
-  return (
-    <ProductsProvider>
-      <ProductsDetailContent />
-    </ProductsProvider>
-  )
+export default function ProductsEdit() {
+  return <ProductsEditContent />
 }

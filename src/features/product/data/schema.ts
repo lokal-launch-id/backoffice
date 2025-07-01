@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { User } from '@/features/users/data/schema'
 
 export const productStatusSchema = z.union([
   z.literal('approved'),
@@ -8,21 +9,61 @@ export const productStatusSchema = z.union([
 export type ProductStatus = z.infer<typeof productStatusSchema>
 
 export const productFormSchema = z.object({
-  name_en: z.string().min(1, { message: 'Name (EN) is required.' }),
-  name_id: z.string().min(1, { message: 'Name (ID) is required.' }),
-  tagline: z.string().min(1, { message: 'Tagline is required.' }),
+  name_en: z
+    .string()
+    .min(3, { message: 'Name (EN) must be at least 3 characters.' })
+    .max(100, { message: 'Name (EN) must be at most 100 characters.' }),
+  name_id: z
+    .string()
+    .min(3, { message: 'Name (ID) must be at least 3 characters.' })
+    .max(100, { message: 'Name (ID) must be at most 100 characters.' }),
+  tagline: z
+    .string()
+    .min(10, { message: 'Tagline must be at least 10 characters.' })
+    .max(200, { message: 'Tagline must be at most 200 characters.' }),
   description_en: z
     .string()
-    .min(1, { message: 'Description (EN) is required.' }),
+    .min(50, { message: 'Description (EN) must be at least 50 characters.' })
+    .max(2000, { message: 'Description (EN) must be at most 2000 characters.' })
+    .refine(
+      (val) => !/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/.test(val),
+      { message: 'Description (EN) must not contain an email address.' }
+    ),
   description_id: z
     .string()
-    .min(1, { message: 'Description (ID) is required.' }),
+    .min(50, { message: 'Description (ID) must be at least 50 characters.' })
+    .max(2000, { message: 'Description (ID) must be at most 2000 characters.' })
+    .refine(
+      (val) => !/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/.test(val),
+      { message: 'Description (ID) must not contain an email address.' }
+    ),
   website_url: z.string().url({ message: 'Please enter a valid URL.' }),
   status: productStatusSchema,
   is_featured: z.boolean(),
-  features: z.array(z.string()),
-  tech_stack: z.array(z.string()),
-  pricing: z.string().optional(),
+  features: z
+    .array(
+      z
+        .string()
+        .min(5, { message: 'Each feature must be at least 5 characters.' })
+        .max(100, { message: 'Each feature must be at most 100 characters.' })
+    )
+    .max(20, { message: 'You can add up to 20 features.' }),
+  tech_stack: z
+    .array(
+      z
+        .string()
+        .min(2, {
+          message: 'Each tech stack item must be at least 2 characters.',
+        })
+        .max(50, {
+          message: 'Each tech stack item must be at most 50 characters.',
+        })
+    )
+    .max(15, { message: 'You can add up to 15 tech stack items.' }),
+  pricing: z
+    .string()
+    .max(100, { message: 'Pricing must be at most 100 characters.' })
+    .optional(),
   images: z.array(
     z.object({
       id: z.string(),
@@ -32,16 +73,33 @@ export const productFormSchema = z.object({
       created_at: z.string(),
     })
   ),
+  launch_date: z.date().optional(),
+  category_id: z.string().optional(),
+  category: z.string().optional(),
 })
 
 export type ProductFormData = z.infer<typeof productFormSchema>
 
-// export const userListSchema = z.array(userSchema)
 export type ProductImage = {
   id: string
   product_id: string
   image_url: string
   order_index: number
+  created_at: string
+}
+
+type UploadImageType = 'avatar' | 'product' | 'general'
+
+export interface UploadImage {
+  file: File
+  type: UploadImageType
+}
+
+export interface Category {
+  id: string
+  name_en: string
+  name_id: string
+  icon_url: string
   created_at: string
 }
 
@@ -60,27 +118,15 @@ export interface Product {
   total_comments: number
   created_at: string
   updated_at: string
-  category: {
-    id: string
-    name_en: string
-    name_id: string
-    icon_url: string
-    created_at: string
-    updated_at: string
-  }
-  user: {
-    id: string
-    username: string
-    first_name: string | null
-    last_name: string | null
-    avatar_url: string
-    is_indonesian_maker: boolean
-  }
+  category: Category
+  user: Partial<User>
   is_featured: boolean
   features: string[]
   tech_stack: string[]
   pricing: string
   user_clapped: boolean
   user_claps: number
+  logo_url: string
   images?: ProductImage[]
+  launch_date: Date
 }
