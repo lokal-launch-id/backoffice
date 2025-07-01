@@ -29,6 +29,9 @@ export const API_ENDPOINTS = {
   categories: {
     list: '/categories',
     detail: (id: string) => `/categories/${id}`,
+    create: '/admin/categories',
+    update: (id: string) => `/admin/categories/${id}`,
+    delete: (id: string) => `/admin/categories/${id}`,
   },
   // Auth
   auth: {
@@ -121,7 +124,21 @@ export class ApiClient {
         // You might want to trigger a redirect to login here
         // window.location.href = '/login'
       }
-      throw new Error(`API Error: ${response.status} ${response.statusText}`)
+
+      // Try to parse error response body for more detailed error message
+      let errorMessage = `${response.status} ${response.statusText}`
+      try {
+        const errorData = await response.json()
+        if (errorData.error) {
+          errorMessage = errorData.error
+        } else if (errorData.message) {
+          errorMessage = errorData.message
+        }
+      } catch {
+        // If we can't parse the error response, use the default message
+      }
+
+      throw new Error(errorMessage)
     }
 
     return response.json()
