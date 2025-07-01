@@ -26,7 +26,7 @@ export class CategoriesApi {
   static async createCategory(
     categoryData: CategoryRequest
   ): Promise<Category> {
-    return apiClient.post<Category>(API_ENDPOINTS.categories.list, {
+    return apiClient.post<Category>(API_ENDPOINTS.categories.create, {
       ...categoryData,
     })
   }

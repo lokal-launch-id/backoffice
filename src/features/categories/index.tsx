@@ -5,6 +5,7 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { categoriesColumns } from './components/categories-columns'
 import { CategoriesDialogs } from './components/categories-dialogs'
+import { CategoriesPrimaryButtons } from './components/categories-primary-buttons'
 import { CategoriesTable } from './components/categories-table'
 import { useCategories } from './hooks/use-categories'
 
@@ -28,6 +29,7 @@ export default function Categories() {
               Manage your categories here.
             </p>
           </div>
+          <CategoriesPrimaryButtons />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
           {isLoading ? (
