@@ -55,7 +55,7 @@ export const sidebarData: SidebarData = {
         },
         {
           title: 'Categories',
-          url: '/apps',
+          url: '/categories',
           icon: IconPackages,
         },
       ],
