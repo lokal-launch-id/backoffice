@@ -38,6 +38,7 @@ import { Route as AuthenticatedSettingsAccountImport } from './routes/_authentic
 import { Route as AuthenticatedProductsListImport } from './routes/_authenticated/products/list'
 import { Route as AuthenticatedProductsDetailImport } from './routes/_authenticated/products/detail'
 import { Route as AuthenticatedProductsCreateImport } from './routes/_authenticated/products/create'
+import { Route as AuthenticatedCategoriesCreateImport } from './routes/_authenticated/categories/create'
 import { Route as AuthenticatedProductsEditProductIdImport } from './routes/_authenticated/products/edit/$productId'
 import { Route as AuthenticatedProductsDetailProductIdImport } from './routes/_authenticated/products/detail/$productId'
 
@@ -218,6 +219,13 @@ const AuthenticatedProductsCreateRoute =
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
+const AuthenticatedCategoriesCreateRoute =
+  AuthenticatedCategoriesCreateImport.update({
+    id: '/categories/create',
+    path: '/categories/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
 const AuthenticatedProductsEditProductIdRoute =
   AuthenticatedProductsEditProductIdImport.update({
     id: '/products/edit/$productId',
@@ -325,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/categories/create': {
+      id: '/_authenticated/categories/create'
+      path: '/categories/create'
+      fullPath: '/categories/create'
+      preLoaderRoute: typeof AuthenticatedCategoriesCreateImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/products/create': {
@@ -485,6 +500,7 @@ const AuthenticatedProductsDetailRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCategoriesCreateRoute: typeof AuthenticatedCategoriesCreateRoute
   AuthenticatedProductsCreateRoute: typeof AuthenticatedProductsCreateRoute
   AuthenticatedProductsDetailRoute: typeof AuthenticatedProductsDetailRouteWithChildren
   AuthenticatedProductsListRoute: typeof AuthenticatedProductsListRoute
@@ -500,6 +516,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCategoriesCreateRoute: AuthenticatedCategoriesCreateRoute,
   AuthenticatedProductsCreateRoute: AuthenticatedProductsCreateRoute,
   AuthenticatedProductsDetailRoute:
     AuthenticatedProductsDetailRouteWithChildren,
@@ -531,6 +548,7 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/categories/create': typeof AuthenticatedCategoriesCreateRoute
   '/products/create': typeof AuthenticatedProductsCreateRoute
   '/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
   '/products/list': typeof AuthenticatedProductsListRoute
@@ -561,6 +579,7 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/categories/create': typeof AuthenticatedCategoriesCreateRoute
   '/products/create': typeof AuthenticatedProductsCreateRoute
   '/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
   '/products/list': typeof AuthenticatedProductsListRoute
@@ -594,6 +613,7 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/categories/create': typeof AuthenticatedCategoriesCreateRoute
   '/_authenticated/products/create': typeof AuthenticatedProductsCreateRoute
   '/_authenticated/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
   '/_authenticated/products/list': typeof AuthenticatedProductsListRoute
@@ -628,6 +648,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/categories/create'
     | '/products/create'
     | '/products/detail'
     | '/products/list'
@@ -657,6 +678,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/categories/create'
     | '/products/create'
     | '/products/detail'
     | '/products/list'
@@ -688,6 +710,7 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/_authenticated/categories/create'
     | '/_authenticated/products/create'
     | '/_authenticated/products/detail'
     | '/_authenticated/products/list'
@@ -763,6 +786,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/settings",
         "/_authenticated/",
+        "/_authenticated/categories/create",
         "/_authenticated/products/create",
         "/_authenticated/products/detail",
         "/_authenticated/products/list",
@@ -818,6 +842,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/": {
       "filePath": "_authenticated/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/categories/create": {
+      "filePath": "_authenticated/categories/create.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/products/create": {

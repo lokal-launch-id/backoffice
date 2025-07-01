@@ -65,6 +65,19 @@ const queryClient = new QueryClient({
         if (error.response?.status === 403) {
           // router.navigate("/forbidden", { replace: true });
         }
+      } else if (error instanceof Error) {
+        // Handle regular Error objects (from fetch API)
+        if (error.message.includes('401')) {
+          toast.error('Session expired!')
+          useAuthStore.getState().reset()
+          const redirect = `${router.history.location.href}`
+          router.navigate({ to: '/sign-in', search: { redirect } })
+        } else if (error.message.includes('500')) {
+          toast.error('Internal Server Error!')
+          router.navigate({ to: '/500' })
+        } else if (error.message.includes('403')) {
+          // router.navigate("/forbidden", { replace: true });
+        }
       }
     },
   }),
