@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
     create: '/products',
     update: (id: string) => `/products/${id}`,
     delete: (id: string) => `/products/${id}`,
+    updateStatus: (id: string) => `/admin/products/${id}/status`,
   },
   // Users
   users: {

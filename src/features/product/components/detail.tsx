@@ -90,12 +90,14 @@ function ProductsDetailContent() {
             </h2>
           </div>
         </div>
-        <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
-          <ProductForm
-            product={selectedProduct}
-            isEditing={false}
-            onSubmit={handleFormSubmit}
-          />
+        <div className='-mx-4 flex overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-6'>
+          <div className='w-full lg:w-3/3'>
+            <ProductForm
+              product={selectedProduct}
+              isEditing={false}
+              onSubmit={handleFormSubmit}
+            />
+          </div>
         </div>
       </Main>
       <ProductDialogs />

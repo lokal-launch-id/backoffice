@@ -6,6 +6,7 @@ import {
   updateProduct,
   deleteProduct,
   PaginationParams,
+  updateProductStatus,
 } from '../api/products-api'
 import { Product } from '../data/schema'
 
@@ -80,6 +81,23 @@ export const useDeleteProduct = () => {
       // Remove the product from cache
       queryClient.removeQueries({ queryKey: productKeys.detail(deletedId) })
       // Invalidate products list
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() })
+    },
+  })
+}
+
+export const useProductDecision = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string
+      data: { status: string; reason?: string }
+    }) => updateProductStatus(id, data),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.lists() })
     },
   })

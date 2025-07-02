@@ -10,6 +10,7 @@ import { useUpdateProduct } from '../hooks/use-products'
 import { useProducts } from '../stores/productsStore'
 import { ProductDialogs } from './product-dialogs'
 import { ProductForm } from './product-form'
+import { ProductSidebar } from './product-sidebar'
 
 function ProductsEditContent() {
   const { productId } = useParams({
@@ -91,18 +92,19 @@ function ProductsEditContent() {
         </div>
       </Header>
       <Main>
-        <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
-          <div>
-            <h2 className='text-2xl font-bold tracking-tight'>Edit Product</h2>
+        <div className='-mx-4 flex overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-4'>
+          <div className='w-full lg:w-2/3'>
+            <ProductForm
+              product={selectedProduct}
+              isEditing={true}
+              hideStatus={true}
+              onSubmit={handleFormSubmit}
+              onCancel={handleCancel}
+            />
           </div>
-        </div>
-        <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
-          <ProductForm
-            product={selectedProduct}
-            isEditing={true}
-            onSubmit={handleFormSubmit}
-            onCancel={handleCancel}
-          />
+          <div className='w-full lg:w-1/3'>
+            <ProductSidebar />
+          </div>
         </div>
       </Main>
       <ProductDialogs />

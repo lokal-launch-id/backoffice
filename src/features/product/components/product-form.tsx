@@ -416,13 +416,17 @@ export function ProductForm({
                 name='status'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>Current Status</FormLabel>
+                    <div className='text-sm text-red-300'>
+                      Status change can be done from Decision Management (Right
+                      side) or Database (TBU)
+                    </div>
                     <Select
                       onValueChange={(value) => {
                         field.onChange(value as ProductStatus)
                       }}
                       value={field.value ?? ''}
-                      disabled={!isEditing}
+                      disabled={true}
                     >
                       <FormControl>
                         <SelectTrigger>

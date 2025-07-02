@@ -61,7 +61,6 @@ export class ProductsApi {
 
   // Create new product
   static async createProduct(productData: ProductsRequest): Promise<Product> {
-    console.log(productData, 'productData SEND TO BACKEND')
     return apiClient.post<Product>(API_ENDPOINTS.products.create, {
       ...productData,
     })
@@ -87,6 +86,17 @@ export class ProductsApi {
   static async getCategories(): Promise<Category[]> {
     return apiClient.get<Category[]>(API_ENDPOINTS.categories.list)
   }
+
+  // Update product status
+  static async updateProductStatus(
+    id: string,
+    data: { status: string; reason?: string }
+  ): Promise<void> {
+    return apiClient.patch<void>(API_ENDPOINTS.products.updateStatus(id), {
+      status: data.status,
+      reason: data.reason,
+    })
+  }
 }
 
 // Export individual functions for convenience
@@ -97,4 +107,5 @@ export const {
   updateProduct,
   deleteProduct,
   getCategories,
+  updateProductStatus,
 } = ProductsApi
