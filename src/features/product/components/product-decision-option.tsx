@@ -50,7 +50,7 @@ const ProductDecisionOption: React.FC = () => {
     await apiClient.patch(API_ENDPOINTS.products.updateStatus(productId), {
       status,
     })
-    toast.success('Product status updated successfully')
+    toast.success(`Product status updated to ${status}`)
     navigate({ to: `/products/detail/${productId}` })
   }
 
