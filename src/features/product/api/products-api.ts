@@ -33,6 +33,20 @@ export interface ProductsRequest {
 export interface PaginationParams {
   page?: number
   pageSize?: number
+  limit?: number
+}
+
+export interface ProductQueueItem {
+  id: string
+  name_en: string
+  created_at: string
+  user_id: string
+  days_in_queue: number
+}
+
+export interface ProductQueueResponse {
+  data: ProductQueueItem[]
+  meta: PaginationMeta
 }
 
 export class ProductsApi {
@@ -45,6 +59,9 @@ export class ProductsApi {
     }
     if (params?.pageSize) {
       searchParams.append('page_size', params.pageSize.toString())
+    }
+    if (params?.limit) {
+      searchParams.append('limit', params.limit.toString())
     }
 
     const endpoint =
@@ -97,6 +114,25 @@ export class ProductsApi {
       reason: data.reason,
     })
   }
+
+  static async getPendingQueue(
+    params?: PaginationParams
+  ): Promise<ProductQueueResponse> {
+    const searchParams = new URLSearchParams()
+    if (params?.page) {
+      searchParams.append('page', params.page.toString())
+    }
+    if (params?.pageSize) {
+      searchParams.append('page_size', params.pageSize.toString())
+    }
+    if (params?.limit) {
+      searchParams.append('limit', params.limit.toString())
+    }
+    const endpoint =
+      '/moderator/products/pending-queue' +
+      (searchParams.toString() ? `?${searchParams.toString()}` : '')
+    return apiClient.get<ProductQueueResponse>(endpoint)
+  }
 }
 
 // Export individual functions for convenience
@@ -108,4 +144,5 @@ export const {
   deleteProduct,
   getCategories,
   updateProductStatus,
+  getPendingQueue,
 } = ProductsApi

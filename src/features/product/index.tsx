@@ -13,7 +13,8 @@ import { useProducts as useProductsQuery } from './hooks/use-products'
 export default function Products() {
   const [pagination, setPagination] = useState<PaginationParams>({
     page: 1,
-    pageSize: 10,
+    pageSize: 30,
+    limit: 30,
   })
 
   const { data, isLoading, error } = useProductsQuery(undefined, pagination)
@@ -23,7 +24,7 @@ export default function Products() {
   }
 
   const handlePageSizeChange = (pageSize: number) => {
-    setPagination({ page: 1, pageSize }) // Reset to first page when changing page size
+    setPagination({ page: 1, pageSize, limit: pagination.limit }) // Reset to first page when changing page size
   }
 
   return (

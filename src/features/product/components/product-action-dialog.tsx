@@ -26,7 +26,8 @@ const formSchema = z.object({
   name_en: z.string().min(1, { message: 'Name (EN) is required.' }),
   name_id: z.string().min(1, { message: 'Name (ID) is required.' }),
   status: productStatusSchema,
-  is_featured: z.boolean().default(false),
+  is_featured: z.boolean(),
+  created_at: z.string().nullable(),
   user: z.object({
     first_name: z.string().nullable(),
     last_name: z.string().nullable(),
@@ -43,11 +44,24 @@ interface Props {
 
 export function ProductActionDialog({ currentRow, open, onOpenChange }: Props) {
   const isEdit = !!currentRow
-  const form = useForm<ProductForm>({
+  const currentRowData: ProductForm = {
+    created_at: currentRow?.created_at ?? null,
+    name_en: currentRow?.name_en ?? '',
+    name_id: currentRow?.name_id ?? '',
+    status: currentRow?.status ?? 'pending',
+    is_featured: currentRow?.is_featured ?? false,
+    user: {
+      first_name: currentRow?.user?.first_name ?? '',
+      last_name: currentRow?.user?.last_name ?? '',
+      username: currentRow?.user?.username ?? '',
+    },
+  }
+  const form = useForm<ProductForm, unknown, ProductForm>({
     resolver: zodResolver(formSchema),
     defaultValues: isEdit
-      ? currentRow
+      ? currentRowData
       : {
+          created_at: '',
           name_en: '',
           name_id: '',
           status: 'pending',
@@ -150,7 +164,11 @@ export function ProductActionDialog({ currentRow, open, onOpenChange }: Props) {
                   <FormItem>
                     <FormLabel>Maker First Name</FormLabel>
                     <FormControl>
-                      <Input placeholder='First Name' {...field} />
+                      <Input
+                        placeholder='First Name'
+                        {...field}
+                        value={field.value ?? ''}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -163,7 +181,11 @@ export function ProductActionDialog({ currentRow, open, onOpenChange }: Props) {
                   <FormItem>
                     <FormLabel>Maker Last Name</FormLabel>
                     <FormControl>
-                      <Input placeholder='Last Name' {...field} />
+                      <Input
+                        placeholder='Last Name'
+                        {...field}
+                        value={field.value ?? ''}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

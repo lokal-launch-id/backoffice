@@ -4,8 +4,8 @@ import { ProductHistoryList } from './product-history-list'
 export function ProductSidebar() {
   return (
     <div className='space-y-4'>
-      <ProductDecisionOption></ProductDecisionOption>
-      <ProductHistoryList></ProductHistoryList>
+      <ProductDecisionOption />
+      <ProductHistoryList />
     </div>
   )
 }

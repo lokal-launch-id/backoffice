@@ -7,6 +7,7 @@ import {
   deleteProduct,
   PaginationParams,
   updateProductStatus,
+  getPendingQueue,
 } from '../api/products-api'
 import { Product } from '../data/schema'
 
@@ -100,5 +101,12 @@ export const useProductDecision = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.lists() })
     },
+  })
+}
+
+export const useProductQueue = (pagination?: PaginationParams) => {
+  return useQuery({
+    queryKey: ['product-queue', pagination],
+    queryFn: () => getPendingQueue(pagination),
   })
 }
