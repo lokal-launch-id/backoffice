@@ -28,6 +28,7 @@ import { Route as AuthenticatedUsersIndexImport } from './routes/_authenticated/
 import { Route as AuthenticatedSettingsIndexImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedProductsIndexImport } from './routes/_authenticated/products/index'
 import { Route as AuthenticatedHelpCenterIndexImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedClapsIndexImport } from './routes/_authenticated/claps/index'
 import { Route as AuthenticatedChatsIndexImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCategoriesIndexImport } from './routes/_authenticated/categories/index'
 import { Route as AuthenticatedAppsIndexImport } from './routes/_authenticated/apps/index'
@@ -35,9 +36,12 @@ import { Route as AuthenticatedSettingsNotificationsImport } from './routes/_aut
 import { Route as AuthenticatedSettingsDisplayImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountImport } from './routes/_authenticated/settings/account'
+import { Route as AuthenticatedProductsQueueImport } from './routes/_authenticated/products/queue'
 import { Route as AuthenticatedProductsListImport } from './routes/_authenticated/products/list'
 import { Route as AuthenticatedProductsDetailImport } from './routes/_authenticated/products/detail'
 import { Route as AuthenticatedProductsCreateImport } from './routes/_authenticated/products/create'
+import { Route as AuthenticatedClapsModerationImport } from './routes/_authenticated/claps/moderation'
+import { Route as AuthenticatedClapsAnalyticsImport } from './routes/_authenticated/claps/analytics'
 import { Route as AuthenticatedCategoriesCreateImport } from './routes/_authenticated/categories/create'
 import { Route as AuthenticatedProductsEditProductIdImport } from './routes/_authenticated/products/edit/$productId'
 import { Route as AuthenticatedProductsDetailProductIdImport } from './routes/_authenticated/products/detail/$productId'
@@ -152,6 +156,12 @@ const AuthenticatedHelpCenterIndexRoute =
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
+const AuthenticatedClapsIndexRoute = AuthenticatedClapsIndexImport.update({
+  id: '/claps/',
+  path: '/claps/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexImport.update({
   id: '/chats/',
   path: '/chats/',
@@ -199,6 +209,14 @@ const AuthenticatedSettingsAccountRoute =
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
 
+const AuthenticatedProductsQueueRoute = AuthenticatedProductsQueueImport.update(
+  {
+    id: '/products/queue',
+    path: '/products/queue',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any,
+)
+
 const AuthenticatedProductsListRoute = AuthenticatedProductsListImport.update({
   id: '/products/list',
   path: '/products/list',
@@ -216,6 +234,20 @@ const AuthenticatedProductsCreateRoute =
   AuthenticatedProductsCreateImport.update({
     id: '/products/create',
     path: '/products/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
+const AuthenticatedClapsModerationRoute =
+  AuthenticatedClapsModerationImport.update({
+    id: '/claps/moderation',
+    path: '/claps/moderation',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
+const AuthenticatedClapsAnalyticsRoute =
+  AuthenticatedClapsAnalyticsImport.update({
+    id: '/claps/analytics',
+    path: '/claps/analytics',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -342,6 +374,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCategoriesCreateImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/claps/analytics': {
+      id: '/_authenticated/claps/analytics'
+      path: '/claps/analytics'
+      fullPath: '/claps/analytics'
+      preLoaderRoute: typeof AuthenticatedClapsAnalyticsImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/claps/moderation': {
+      id: '/_authenticated/claps/moderation'
+      path: '/claps/moderation'
+      fullPath: '/claps/moderation'
+      preLoaderRoute: typeof AuthenticatedClapsModerationImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/products/create': {
       id: '/_authenticated/products/create'
       path: '/products/create'
@@ -361,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: '/products/list'
       fullPath: '/products/list'
       preLoaderRoute: typeof AuthenticatedProductsListImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/products/queue': {
+      id: '/_authenticated/products/queue'
+      path: '/products/queue'
+      fullPath: '/products/queue'
+      preLoaderRoute: typeof AuthenticatedProductsQueueImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/settings/account': {
@@ -410,6 +463,13 @@ declare module '@tanstack/react-router' {
       path: '/chats'
       fullPath: '/chats'
       preLoaderRoute: typeof AuthenticatedChatsIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/claps/': {
+      id: '/_authenticated/claps/'
+      path: '/claps'
+      fullPath: '/claps'
+      preLoaderRoute: typeof AuthenticatedClapsIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/help-center/': {
@@ -501,12 +561,16 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedCategoriesCreateRoute: typeof AuthenticatedCategoriesCreateRoute
+  AuthenticatedClapsAnalyticsRoute: typeof AuthenticatedClapsAnalyticsRoute
+  AuthenticatedClapsModerationRoute: typeof AuthenticatedClapsModerationRoute
   AuthenticatedProductsCreateRoute: typeof AuthenticatedProductsCreateRoute
   AuthenticatedProductsDetailRoute: typeof AuthenticatedProductsDetailRouteWithChildren
   AuthenticatedProductsListRoute: typeof AuthenticatedProductsListRoute
+  AuthenticatedProductsQueueRoute: typeof AuthenticatedProductsQueueRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedCategoriesIndexRoute: typeof AuthenticatedCategoriesIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedClapsIndexRoute: typeof AuthenticatedClapsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
@@ -517,13 +581,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedCategoriesCreateRoute: AuthenticatedCategoriesCreateRoute,
+  AuthenticatedClapsAnalyticsRoute: AuthenticatedClapsAnalyticsRoute,
+  AuthenticatedClapsModerationRoute: AuthenticatedClapsModerationRoute,
   AuthenticatedProductsCreateRoute: AuthenticatedProductsCreateRoute,
   AuthenticatedProductsDetailRoute:
     AuthenticatedProductsDetailRouteWithChildren,
   AuthenticatedProductsListRoute: AuthenticatedProductsListRoute,
+  AuthenticatedProductsQueueRoute: AuthenticatedProductsQueueRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedCategoriesIndexRoute: AuthenticatedCategoriesIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedClapsIndexRoute: AuthenticatedClapsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
@@ -549,9 +617,12 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
   '/categories/create': typeof AuthenticatedCategoriesCreateRoute
+  '/claps/analytics': typeof AuthenticatedClapsAnalyticsRoute
+  '/claps/moderation': typeof AuthenticatedClapsModerationRoute
   '/products/create': typeof AuthenticatedProductsCreateRoute
   '/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
   '/products/list': typeof AuthenticatedProductsListRoute
+  '/products/queue': typeof AuthenticatedProductsQueueRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
@@ -559,6 +630,7 @@ export interface FileRoutesByFullPath {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/categories': typeof AuthenticatedCategoriesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/claps': typeof AuthenticatedClapsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -580,9 +652,12 @@ export interface FileRoutesByTo {
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
   '/categories/create': typeof AuthenticatedCategoriesCreateRoute
+  '/claps/analytics': typeof AuthenticatedClapsAnalyticsRoute
+  '/claps/moderation': typeof AuthenticatedClapsModerationRoute
   '/products/create': typeof AuthenticatedProductsCreateRoute
   '/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
   '/products/list': typeof AuthenticatedProductsListRoute
+  '/products/queue': typeof AuthenticatedProductsQueueRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
@@ -590,6 +665,7 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/categories': typeof AuthenticatedCategoriesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/claps': typeof AuthenticatedClapsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
@@ -614,9 +690,12 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/categories/create': typeof AuthenticatedCategoriesCreateRoute
+  '/_authenticated/claps/analytics': typeof AuthenticatedClapsAnalyticsRoute
+  '/_authenticated/claps/moderation': typeof AuthenticatedClapsModerationRoute
   '/_authenticated/products/create': typeof AuthenticatedProductsCreateRoute
   '/_authenticated/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
   '/_authenticated/products/list': typeof AuthenticatedProductsListRoute
+  '/_authenticated/products/queue': typeof AuthenticatedProductsQueueRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
@@ -624,6 +703,7 @@ export interface FileRoutesById {
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/categories/': typeof AuthenticatedCategoriesIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/claps/': typeof AuthenticatedClapsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -649,9 +729,12 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/categories/create'
+    | '/claps/analytics'
+    | '/claps/moderation'
     | '/products/create'
     | '/products/detail'
     | '/products/list'
+    | '/products/queue'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
@@ -659,6 +742,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/categories'
     | '/chats'
+    | '/claps'
     | '/help-center'
     | '/products'
     | '/settings/'
@@ -679,9 +763,12 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/categories/create'
+    | '/claps/analytics'
+    | '/claps/moderation'
     | '/products/create'
     | '/products/detail'
     | '/products/list'
+    | '/products/queue'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
@@ -689,6 +776,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/categories'
     | '/chats'
+    | '/claps'
     | '/help-center'
     | '/products'
     | '/settings'
@@ -711,9 +799,12 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/_authenticated/'
     | '/_authenticated/categories/create'
+    | '/_authenticated/claps/analytics'
+    | '/_authenticated/claps/moderation'
     | '/_authenticated/products/create'
     | '/_authenticated/products/detail'
     | '/_authenticated/products/list'
+    | '/_authenticated/products/queue'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
@@ -721,6 +812,7 @@ export interface FileRouteTypes {
     | '/_authenticated/apps/'
     | '/_authenticated/categories/'
     | '/_authenticated/chats/'
+    | '/_authenticated/claps/'
     | '/_authenticated/help-center/'
     | '/_authenticated/products/'
     | '/_authenticated/settings/'
@@ -787,12 +879,16 @@ export const routeTree = rootRoute
         "/_authenticated/settings",
         "/_authenticated/",
         "/_authenticated/categories/create",
+        "/_authenticated/claps/analytics",
+        "/_authenticated/claps/moderation",
         "/_authenticated/products/create",
         "/_authenticated/products/detail",
         "/_authenticated/products/list",
+        "/_authenticated/products/queue",
         "/_authenticated/apps/",
         "/_authenticated/categories/",
         "/_authenticated/chats/",
+        "/_authenticated/claps/",
         "/_authenticated/help-center/",
         "/_authenticated/products/",
         "/_authenticated/users/",
@@ -848,6 +944,14 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/categories/create.tsx",
       "parent": "/_authenticated"
     },
+    "/_authenticated/claps/analytics": {
+      "filePath": "_authenticated/claps/analytics.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/claps/moderation": {
+      "filePath": "_authenticated/claps/moderation.tsx",
+      "parent": "/_authenticated"
+    },
     "/_authenticated/products/create": {
       "filePath": "_authenticated/products/create.tsx",
       "parent": "/_authenticated"
@@ -861,6 +965,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/products/list": {
       "filePath": "_authenticated/products/list.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/products/queue": {
+      "filePath": "_authenticated/products/queue.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/settings/account": {
@@ -889,6 +997,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/chats/": {
       "filePath": "_authenticated/chats/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/claps/": {
+      "filePath": "_authenticated/claps/index.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/help-center/": {

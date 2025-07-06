@@ -1,14 +1,14 @@
 import {
-  IconBrowserCheck,
+  IconCalendarTime,
+  IconChartBar,
   IconChecklist,
+  IconConfetti,
   IconHelp,
   IconLayoutDashboard,
-  IconNotification,
   IconPackages,
   IconPalette,
+  IconSandbox,
   IconSettings,
-  IconTool,
-  IconUserCog,
   IconUsers,
 } from '@tabler/icons-react'
 import { Command } from 'lucide-react'
@@ -46,12 +46,34 @@ export const sidebarData: SidebarData = {
               url: '/products/create',
               icon: IconChecklist,
             },
+            {
+              title: 'Queue',
+              url: '/products/queue',
+              icon: IconCalendarTime,
+            },
           ],
         },
         {
           title: 'Users',
           url: '/users',
           icon: IconUsers,
+        },
+        {
+          title: 'Claps',
+          url: '/claps',
+          icon: IconConfetti,
+          items: [
+            {
+              title: 'Moderation',
+              url: '/claps/moderation',
+              icon: IconSandbox,
+            },
+            {
+              title: 'Analytics',
+              url: '/claps/analytics',
+              icon: IconChartBar,
+            },
+          ],
         },
         {
           title: 'Categories',
@@ -68,31 +90,31 @@ export const sidebarData: SidebarData = {
           title: 'Settings',
           icon: IconSettings,
           items: [
-            {
-              title: 'Profile',
-              url: '/settings',
-              icon: IconUserCog,
-            },
-            {
-              title: 'Account',
-              url: '/settings/account',
-              icon: IconTool,
-            },
+            // {
+            //   title: 'Profile',
+            //   url: '/settings',
+            //   icon: IconUserCog,
+            // },
+            // {
+            //   title: 'Account',
+            //   url: '/settings/account',
+            //   icon: IconTool,
+            // },
             {
               title: 'Appearance',
               url: '/settings/appearance',
               icon: IconPalette,
             },
-            {
-              title: 'Notifications',
-              url: '/settings/notifications',
-              icon: IconNotification,
-            },
-            {
-              title: 'Display',
-              url: '/settings/display',
-              icon: IconBrowserCheck,
-            },
+            // {
+            //   title: 'Notifications',
+            //   url: '/settings/notifications',
+            //   icon: IconNotification,
+            // },
+            // {
+            //   title: 'Display',
+            //   url: '/settings/display',
+            //   icon: IconBrowserCheck,
+            // },
           ],
         },
         {
