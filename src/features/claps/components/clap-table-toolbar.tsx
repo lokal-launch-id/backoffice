@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Clap } from '../data/schema'
 
 interface ClapTableToolbarProps<TData> {
   table: Table<TData>
