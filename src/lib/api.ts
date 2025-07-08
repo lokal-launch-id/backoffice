@@ -42,6 +42,10 @@ export const API_ENDPOINTS = {
     refresh: '/refresh',
     resendVerification: '/auth/resend-verification',
   },
+  // Utilities
+  utilities: {
+    upload: '/upload',
+  },
   upload: {
     s3URL: '/upload/image',
   },

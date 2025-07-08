@@ -11,7 +11,7 @@ import {
   IconSettings,
   IconUsers,
 } from '@tabler/icons-react'
-import { Command } from 'lucide-react'
+import { Command, Upload } from 'lucide-react'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -79,6 +79,17 @@ export const sidebarData: SidebarData = {
           title: 'Categories',
           url: '/categories',
           icon: IconPackages,
+        },
+        {
+          title: 'Utilities',
+          icon: Upload,
+          items: [
+            {
+              title: 'Upload',
+              url: '/utilities/upload',
+              icon: Upload,
+            },
+          ],
         },
       ],
     },

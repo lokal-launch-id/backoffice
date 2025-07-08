@@ -24,6 +24,7 @@ import { Route as authSignInImport } from './routes/(auth)/sign-in'
 import { Route as authOtpImport } from './routes/(auth)/otp'
 import { Route as authForgotPasswordImport } from './routes/(auth)/forgot-password'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings/route'
+import { Route as AuthenticatedUtilitiesIndexImport } from './routes/_authenticated/utilities/index'
 import { Route as AuthenticatedUsersIndexImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedSettingsIndexImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedProductsIndexImport } from './routes/_authenticated/products/index'
@@ -32,6 +33,7 @@ import { Route as AuthenticatedClapsIndexImport } from './routes/_authenticated/
 import { Route as AuthenticatedChatsIndexImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCategoriesIndexImport } from './routes/_authenticated/categories/index'
 import { Route as AuthenticatedAppsIndexImport } from './routes/_authenticated/apps/index'
+import { Route as AuthenticatedUtilitiesUploadImport } from './routes/_authenticated/utilities/upload'
 import { Route as AuthenticatedSettingsNotificationsImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceImport } from './routes/_authenticated/settings/appearance'
@@ -127,6 +129,13 @@ const AuthenticatedSettingsRouteRoute = AuthenticatedSettingsRouteImport.update(
   } as any,
 )
 
+const AuthenticatedUtilitiesIndexRoute =
+  AuthenticatedUtilitiesIndexImport.update({
+    id: '/utilities/',
+    path: '/utilities/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
 const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexImport.update({
   id: '/users/',
   path: '/users/',
@@ -180,6 +189,13 @@ const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexImport.update({
   path: '/apps/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+
+const AuthenticatedUtilitiesUploadRoute =
+  AuthenticatedUtilitiesUploadImport.update({
+    id: '/utilities/upload',
+    path: '/utilities/upload',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsImport.update({
@@ -444,6 +460,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsNotificationsImport
       parentRoute: typeof AuthenticatedSettingsRouteImport
     }
+    '/_authenticated/utilities/upload': {
+      id: '/_authenticated/utilities/upload'
+      path: '/utilities/upload'
+      fullPath: '/utilities/upload'
+      preLoaderRoute: typeof AuthenticatedUtilitiesUploadImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/apps/': {
       id: '/_authenticated/apps/'
       path: '/apps'
@@ -498,6 +521,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof AuthenticatedUsersIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/utilities/': {
+      id: '/_authenticated/utilities/'
+      path: '/utilities'
+      fullPath: '/utilities'
+      preLoaderRoute: typeof AuthenticatedUtilitiesIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/products/detail/$productId': {
@@ -567,6 +597,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProductsDetailRoute: typeof AuthenticatedProductsDetailRouteWithChildren
   AuthenticatedProductsListRoute: typeof AuthenticatedProductsListRoute
   AuthenticatedProductsQueueRoute: typeof AuthenticatedProductsQueueRoute
+  AuthenticatedUtilitiesUploadRoute: typeof AuthenticatedUtilitiesUploadRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedCategoriesIndexRoute: typeof AuthenticatedCategoriesIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
@@ -574,6 +605,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedUtilitiesIndexRoute: typeof AuthenticatedUtilitiesIndexRoute
   AuthenticatedProductsEditProductIdRoute: typeof AuthenticatedProductsEditProductIdRoute
 }
 
@@ -588,6 +620,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedProductsDetailRouteWithChildren,
   AuthenticatedProductsListRoute: AuthenticatedProductsListRoute,
   AuthenticatedProductsQueueRoute: AuthenticatedProductsQueueRoute,
+  AuthenticatedUtilitiesUploadRoute: AuthenticatedUtilitiesUploadRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedCategoriesIndexRoute: AuthenticatedCategoriesIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
@@ -595,6 +628,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedUtilitiesIndexRoute: AuthenticatedUtilitiesIndexRoute,
   AuthenticatedProductsEditProductIdRoute:
     AuthenticatedProductsEditProductIdRoute,
 }
@@ -627,6 +661,7 @@ export interface FileRoutesByFullPath {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/utilities/upload': typeof AuthenticatedUtilitiesUploadRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/categories': typeof AuthenticatedCategoriesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
@@ -635,6 +670,7 @@ export interface FileRoutesByFullPath {
   '/products': typeof AuthenticatedProductsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/utilities': typeof AuthenticatedUtilitiesIndexRoute
   '/products/detail/$productId': typeof AuthenticatedProductsDetailProductIdRoute
   '/products/edit/$productId': typeof AuthenticatedProductsEditProductIdRoute
 }
@@ -662,6 +698,7 @@ export interface FileRoutesByTo {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/utilities/upload': typeof AuthenticatedUtilitiesUploadRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/categories': typeof AuthenticatedCategoriesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
@@ -670,6 +707,7 @@ export interface FileRoutesByTo {
   '/products': typeof AuthenticatedProductsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/utilities': typeof AuthenticatedUtilitiesIndexRoute
   '/products/detail/$productId': typeof AuthenticatedProductsDetailProductIdRoute
   '/products/edit/$productId': typeof AuthenticatedProductsEditProductIdRoute
 }
@@ -700,6 +738,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/utilities/upload': typeof AuthenticatedUtilitiesUploadRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/categories/': typeof AuthenticatedCategoriesIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
@@ -708,6 +747,7 @@ export interface FileRoutesById {
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/utilities/': typeof AuthenticatedUtilitiesIndexRoute
   '/_authenticated/products/detail/$productId': typeof AuthenticatedProductsDetailProductIdRoute
   '/_authenticated/products/edit/$productId': typeof AuthenticatedProductsEditProductIdRoute
 }
@@ -739,6 +779,7 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/utilities/upload'
     | '/apps'
     | '/categories'
     | '/chats'
@@ -747,6 +788,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/settings/'
     | '/users'
+    | '/utilities'
     | '/products/detail/$productId'
     | '/products/edit/$productId'
   fileRoutesByTo: FileRoutesByTo
@@ -773,6 +815,7 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/utilities/upload'
     | '/apps'
     | '/categories'
     | '/chats'
@@ -781,6 +824,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/settings'
     | '/users'
+    | '/utilities'
     | '/products/detail/$productId'
     | '/products/edit/$productId'
   id:
@@ -809,6 +853,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/utilities/upload'
     | '/_authenticated/apps/'
     | '/_authenticated/categories/'
     | '/_authenticated/chats/'
@@ -817,6 +862,7 @@ export interface FileRouteTypes {
     | '/_authenticated/products/'
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
+    | '/_authenticated/utilities/'
     | '/_authenticated/products/detail/$productId'
     | '/_authenticated/products/edit/$productId'
   fileRoutesById: FileRoutesById
@@ -885,6 +931,7 @@ export const routeTree = rootRoute
         "/_authenticated/products/detail",
         "/_authenticated/products/list",
         "/_authenticated/products/queue",
+        "/_authenticated/utilities/upload",
         "/_authenticated/apps/",
         "/_authenticated/categories/",
         "/_authenticated/chats/",
@@ -892,6 +939,7 @@ export const routeTree = rootRoute
         "/_authenticated/help-center/",
         "/_authenticated/products/",
         "/_authenticated/users/",
+        "/_authenticated/utilities/",
         "/_authenticated/products/edit/$productId"
       ]
     },
@@ -987,6 +1035,10 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/settings/notifications.tsx",
       "parent": "/_authenticated/settings"
     },
+    "/_authenticated/utilities/upload": {
+      "filePath": "_authenticated/utilities/upload.tsx",
+      "parent": "/_authenticated"
+    },
     "/_authenticated/apps/": {
       "filePath": "_authenticated/apps/index.tsx",
       "parent": "/_authenticated"
@@ -1017,6 +1069,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/users/": {
       "filePath": "_authenticated/users/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/utilities/": {
+      "filePath": "_authenticated/utilities/index.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/products/detail/$productId": {
