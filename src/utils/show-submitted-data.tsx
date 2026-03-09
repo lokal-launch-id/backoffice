@@ -5,6 +5,7 @@ export function showSubmittedData(
   title: string = 'You submitted the following values:'
 ) {
   toast.message(title, {
+    duration: 10000,
     description: (
       // w-[340px]
       <pre className='mt-2 w-full overflow-x-auto rounded-md bg-slate-950 p-4'>

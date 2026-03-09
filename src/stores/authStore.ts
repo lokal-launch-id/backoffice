@@ -48,7 +48,18 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()((set, get) => {
   const cookieState = Cookies.get('token')
-  const initToken = cookieState ? JSON.parse(cookieState) : ''
+  const parseTokenCookie = (value?: string): string => {
+    if (!value) return ''
+
+    try {
+      const parsed = JSON.parse(value)
+      return typeof parsed === 'string' ? parsed : ''
+    } catch {
+      // Fallback for legacy/plain JWT cookie values.
+      return value
+    }
+  }
+  const initToken = parseTokenCookie(cookieState)
 
   // Initialize API client with token if it exists
   if (initToken) {

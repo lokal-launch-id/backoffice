@@ -145,7 +145,7 @@ export const useUsersStore = create<UsersState>()((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const newUser = await apiClient.post<User>(
-        API_ENDPOINTS.auth.register,
+        API_ENDPOINTS.users.create,
         userData as unknown as Record<string, unknown>
       )
       const { users } = get()

@@ -27,6 +27,7 @@ import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { userTypes } from '../data/data'
 import { User } from '../data/schema'
+import { useCreateUser, useUpdateUser } from '../hooks/use-users'
 
 const formSchema = z
   .object({
@@ -94,7 +95,9 @@ interface Props {
 }
 
 export function UsersActionDialog({ currentRow, open }: Props) {
-  const { createUser, updateUser, setOpenDialog } = useUsers()
+  const { setOpenDialog } = useUsers()
+  const createUserMutation = useCreateUser()
+  const updateUserMutation = useUpdateUser()
 
   const isEdit = !!currentRow
   const form = useForm<UserForm>({
@@ -121,16 +124,19 @@ export function UsersActionDialog({ currentRow, open }: Props) {
   const onSubmit = async (values: UserForm) => {
     try {
       if (isEdit && currentRow) {
-        await updateUser(currentRow.id, {
-          first_name: values.first_name,
-          last_name: values.last_name,
-          username: values.username,
-          email: values.email,
-          role: values.role,
+        await updateUserMutation.mutateAsync({
+          id: currentRow.id,
+          data: {
+            first_name: values.first_name,
+            last_name: values.last_name,
+            username: values.username,
+            email: values.email,
+            role: values.role,
+          },
         })
         showSubmittedData(values, 'User updated successfully:')
       } else {
-        await createUser({
+        await createUserMutation.mutateAsync({
           first_name: values.first_name,
           last_name: values.last_name,
           username: values.username,
@@ -142,7 +148,9 @@ export function UsersActionDialog({ currentRow, open }: Props) {
       }
       form.reset()
       setOpenDialog(null)
-    } catch (_) {}
+    } catch (error) {
+      void error
+    }
   }
 
   const isPasswordTouched = !!form.formState.dirtyFields.password

@@ -13,8 +13,9 @@ import { sidebarData } from './data/sidebar-data'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user)
+  const fullName = `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim()
   const userData = {
-    name: user?.first_name || '' + ' ' + user?.last_name || '',
+    name: fullName,
     email: user?.email || '',
     avatar: user?.avatar_url || '',
   }

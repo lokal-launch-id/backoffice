@@ -39,7 +39,7 @@ export class UsersApi {
   static async createUser(
     userData: Omit<User, 'id' | 'created_at' | 'updated_at'>
   ): Promise<User> {
-    return apiClient.post<User>(API_ENDPOINTS.users.list, userData)
+    return apiClient.post<User>(API_ENDPOINTS.users.create, userData)
   }
 
   // Update existing user

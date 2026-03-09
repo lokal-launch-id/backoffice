@@ -133,6 +133,11 @@ export class ProductsApi {
       (searchParams.toString() ? `?${searchParams.toString()}` : '')
     return apiClient.get<ProductQueueResponse>(endpoint)
   }
+
+  // static async updateProductImages(id: string, images: string[]): Promise<void> {
+  //  const endpoint = ?
+
+  // }
 }
 
 // Export individual functions for convenience

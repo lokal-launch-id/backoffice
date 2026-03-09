@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
   // Users
   users: {
     list: '/users',
+    create: '/admin/users',
     detail: (id: string) => `/users/${id}`,
     profile: '/users/profile',
     delete: (id: string) => `/admin/users/${id}`,

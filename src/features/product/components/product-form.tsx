@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { IconEdit, IconX } from '@tabler/icons-react'
 import { useAuthStore } from '@//stores/authStore'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, LucideAlignCenterVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -82,6 +82,7 @@ export function ProductForm({
     features: product.features || [],
     tech_stack: product.tech_stack || [],
     pricing: typeof product.pricing === 'string' ? product.pricing : undefined,
+    // images: product.images as unknown as Partial<ProductImage>[],
     images:
       (product.images as unknown as Partial<ProductImage>[])?.map((image) => ({
         id: image.id || '',
@@ -90,6 +91,7 @@ export function ProductForm({
         order_index: image.order_index || 0,
         created_at: image.created_at || new Date().toISOString(),
       })) || [],
+    // images: product.images as unknown as Partial<ProductImage>[],
     category_id: product.category_id,
     category: product.category?.id || '',
     launch_date:
@@ -109,7 +111,11 @@ export function ProductForm({
     form.reset(initialValues)
   }, [product, isEditing])
 
+  // sampe sini masalahnya data iamge yg diterima BE ga sama sama yg dkirim, ktia kirim full apdahal di BE di raphohin jadi perlu
+  // cums kirim html array nya aaja gpp
   const handleSubmit = (data: ProductFormData) => {
+    console.log('Form submitted with data:', data)
+    console.log('Form errors:', form.formState.errors)
     if (onSubmit) {
       onSubmit({
         ...data,
@@ -144,20 +150,20 @@ export function ProductForm({
     const files = event.target.files
     if (files && files.length > 0) {
       const currentImages = form.getValues('images')
-      const newImages = Array.from(files).map((file) => {
-        // Create a temporary URL for preview
-        return URL.createObjectURL(file)
+      const newImages = Array.from(files).map(() => {
+        return 'https://res.cloudinary.com/dmeupksbl/image/upload/v1751393556/indonesian-product-hunt/product/image-1751393556018_7a3c77b5.png'
       })
-      form.setValue('images', [
-        ...currentImages,
-        ...newImages.map((image) => ({
-          id: '',
-          product_id: product.id,
-          image_url: image,
-          order_index: currentImages.length + 1,
-          created_at: new Date().toISOString(),
-        })),
-      ])
+      form.setValue('images', newImages)
+      // form.setValue('images', [
+      //   ...currentImages,
+      //   ...newImages.map((image, index) => ({
+      //     id: '',
+      //     product_id: product.id,
+      //     image_url: image,
+      //     order_index: currentImages.length + index + 1,
+      //     created_at: new Date().toISOString(),
+      //   })),
+      // ])
     }
   }
 
@@ -178,22 +184,24 @@ export function ProductForm({
       <CardHeader className='flex flex-row items-center justify-between gap-4'>
         <div className='flex items-center gap-4'>
           <Avatar>
-            <AvatarImage src={product.user.avatar_url ?? ''} />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarImage src={product.images?.[0]?.image_url ?? ''} />
+            <AvatarFallback>
+              <LucideAlignCenterVertical />
+            </AvatarFallback>
           </Avatar>
           <div>
             <CardTitle>{product.name_en}</CardTitle>
             <div className='text-muted-foreground text-sm'>
               {product.tagline}
             </div>
+            <div className='text-muted-foreground text-sm'>
+              Product ID: {product.id}
+            </div>
             <div className='mt-2 text-sm'>
               <span className='font-semibold'>Maker: </span>
-              {userName || 'Unknown'}
-              {product.user.is_indonesian_maker && (
-                <span className='ml-2 rounded bg-green-100 px-2 py-0.5 text-xs text-green-800'>
-                  Indonesian Maker
-                </span>
-              )}
+              {userName || 'Unknown'} |{' '}
+              <span className='font-semibold'>User ID: </span>
+              {product.user.id}
             </div>
           </div>
         </div>
@@ -659,13 +667,27 @@ export function ProductForm({
               )}
             </div>
 
+            {/* Debug Form Errors */}
+            {isEditing && Object.keys(form.formState.errors).length > 0 && (
+              <div className='rounded-md border border-red-200 bg-red-50 p-4'>
+                <h4 className='mb-2 font-semibold text-red-800'>
+                  Form Errors:
+                </h4>
+                <pre className='text-sm text-red-700'>
+                  {JSON.stringify(form.formState.errors, null, 2)}
+                </pre>
+              </div>
+            )}
+
             {/* Action Buttons */}
             {isEditing && (
               <div className='flex justify-end space-x-2'>
                 <Button type='button' variant='outline' onClick={handleCancel}>
                   Cancel
                 </Button>
-                <Button type='submit'>Save Changes</Button>
+                <Button type='submit' disabled={!form.formState.isValid}>
+                  Save Changes
+                </Button>
               </div>
             )}
           </form>

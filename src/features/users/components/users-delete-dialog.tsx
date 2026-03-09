@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import { IconAlertTriangle } from '@tabler/icons-react'
-import { useUsers } from '@/stores/usersStore'
 import { showSubmittedData } from '@/utils/show-submitted-data'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { useDeleteUser } from '../hooks/use-users'
 import { User } from '../data/schema'
 
 interface Props {
@@ -18,17 +18,18 @@ interface Props {
 
 export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
   const [value, setValue] = useState('')
-  const { deleteUser, fetchUsers } = useUsers()
+  const deleteUserMutation = useDeleteUser()
 
   const handleDelete = async () => {
     if (value == '' || value.trim() !== currentRow.email) return
 
     try {
-      await deleteUser(currentRow.id)
+      await deleteUserMutation.mutateAsync(currentRow.id)
       showSubmittedData(currentRow, 'The following user has been deleted:')
       onOpenChange(false)
-      fetchUsers()
-    } catch (error) {}
+    } catch (_error) {
+      // Handled by global mutation error handler.
+    }
   }
 
   return (
