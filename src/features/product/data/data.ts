@@ -12,7 +12,7 @@ export const callTypes = new Map<ProductStatus, string>([
     'bg-teal-100/30 text-teal-900 dark:text-teal-200 border-teal-200',
   ],
   [
-    'resubmit',
+    'resubmitted',
     'bg-yellow-100/30 text-yellow-900 dark:text-yellow-200 border-yellow-200',
   ],
   ['pending', 'bg-neutral-300/40 border-neutral-300'],

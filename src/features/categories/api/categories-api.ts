@@ -31,20 +31,25 @@ export class CategoriesApi {
     })
   }
 
-  // Update existing category
+  // Update existing category.
+  //
+  // NOTE: the API exposes only GET /categories and POST /admin/categories.
+  // There is no update or delete route yet, so this will 404 until one exists.
+  // It targets the admin path rather than the public one it used to use, which
+  // could never have been right.
   static async updateCategory(
     id: string,
     categoryData: Partial<Omit<Category, 'id' | 'created_at' | 'updated_at'>>
   ): Promise<Category> {
     return apiClient.patch<Category>(
-      API_ENDPOINTS.categories.detail(id),
+      API_ENDPOINTS.categories.update(id),
       categoryData
     )
   }
 
-  // Delete category
+  // Delete category. See the note on updateCategory: no such route exists yet.
   static async deleteCategory(id: string): Promise<void> {
-    return apiClient.delete<void>(API_ENDPOINTS.categories.detail(id))
+    return apiClient.delete<void>(API_ENDPOINTS.categories.delete(id))
   }
 }
 

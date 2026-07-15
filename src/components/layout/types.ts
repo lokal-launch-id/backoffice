@@ -1,11 +1,5 @@
 import { LinkProps } from '@tanstack/react-router'
 
-interface User {
-  name: string
-  email: string
-  avatar: string
-}
-
 interface Team {
   name: string
   logo: React.ElementType
@@ -35,8 +29,9 @@ interface NavGroup {
   items: NavItem[]
 }
 
+// The signed-in user is not held here: AppSidebar reads it from the auth store
+// and passes it to NavUser directly.
 interface SidebarData {
-  user: User
   teams: Team[]
   navGroups: NavGroup[]
 }

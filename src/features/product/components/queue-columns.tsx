@@ -15,16 +15,11 @@ function QueueProductNameCell({ item }: { item: ProductQueueItem }) {
   )
 }
 
+// Rendered as plain text rather than a link: there is no per-user detail route,
+// only the /users list. This used to point at /users/detail/$userId, which has
+// never existed.
 function QueueUserIdCell({ item }: { item: ProductQueueItem }) {
-  return (
-    <Link
-      to='/users/detail/$userId'
-      params={{ userId: item.user_id }}
-      className='text-blue-600 hover:underline'
-    >
-      {item.user_id}
-    </Link>
-  )
+  return <span className='font-mono text-xs'>{item.user_id}</span>
 }
 
 export const queueColumns: ColumnDef<ProductQueueItem>[] = [

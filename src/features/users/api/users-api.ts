@@ -13,6 +13,21 @@ export interface PaginationParams {
   pageSize?: number
 }
 
+// Mirrors models.AdminCreateUserRequest. It is not a User: creation takes a
+// password and omits the server-assigned fields. Declared as a type rather than
+// an interface so it satisfies the client's Record<string, unknown> body.
+export type CreateUserRequest = {
+  username: string
+  email: string
+  password: string
+  first_name: string
+  last_name: string
+  role: 'user' | 'moderator' | 'admin'
+  is_indonesian_maker?: boolean
+  bio?: string
+  avatar_url?: string
+}
+
 export class UsersApi {
   static async getUsers(params?: PaginationParams): Promise<UserListResponse> {
     const searchParams = new URLSearchParams()
@@ -36,9 +51,7 @@ export class UsersApi {
   }
 
   // Create new user
-  static async createUser(
-    userData: Omit<User, 'id' | 'created_at' | 'updated_at'>
-  ): Promise<User> {
+  static async createUser(userData: CreateUserRequest): Promise<User> {
     return apiClient.post<User>(API_ENDPOINTS.users.create, userData)
   }
 

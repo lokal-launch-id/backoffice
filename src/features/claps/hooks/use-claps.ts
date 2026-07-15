@@ -30,7 +30,7 @@ export const useSetClapToZero = () => {
 
   return useMutation({
     mutationFn: (clapId: string) => setClapToZero(clapId),
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Invalidate and refetch claps list
       queryClient.invalidateQueries({ queryKey: clapKeys.lists() })
       toast.success('Clap count set to zero successfully')
@@ -48,7 +48,7 @@ export const useReduceClap = () => {
   return useMutation({
     mutationFn: ({ clapId, reduceBy }: { clapId: string; reduceBy: number }) =>
       reduceClap(clapId, reduceBy),
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Invalidate and refetch claps list
       queryClient.invalidateQueries({ queryKey: clapKeys.lists() })
       toast.success('Clap count reduced successfully')
@@ -71,7 +71,7 @@ export const useIncrementClap = () => {
       clapId: string
       incrementBy: number
     }) => incrementClap(clapId, incrementBy),
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Invalidate and refetch claps list
       queryClient.invalidateQueries({ queryKey: clapKeys.lists() })
       toast.success('Clap count incremented successfully')

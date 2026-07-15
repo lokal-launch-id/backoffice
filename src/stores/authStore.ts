@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 import { create } from 'zustand'
-import { apiClient } from '@/lib/api'
+import { apiClient, ApiError } from '@/lib/api'
 
 export interface AuthUser {
   id: string
@@ -46,8 +46,13 @@ interface AuthState {
   initialize: () => Promise<void>
 }
 
+// The public web app also runs on localhost and writes a cookie called "token"
+// holding a raw JWT. Sharing the name meant the two apps overwrote each other's
+// sessions during local development, so the back office keeps its own.
+const TOKEN_COOKIE = 'bo_token'
+
 export const useAuthStore = create<AuthState>()((set, get) => {
-  const cookieState = Cookies.get('token')
+  const cookieState = Cookies.get(TOKEN_COOKIE)
   const parseTokenCookie = (value?: string): string => {
     if (!value) return ''
 
@@ -76,19 +81,21 @@ export const useAuthStore = create<AuthState>()((set, get) => {
     // State setters
     setUser: (user) => set({ user }),
     setAccessToken: (accessToken) => {
-      Cookies.set('token', JSON.stringify(accessToken))
+      // Stored raw. It used to be JSON.stringify'd, which wrapped the JWT in
+      // quotes and forced every reader to unwrap it.
+      Cookies.set(TOKEN_COOKIE, accessToken, { sameSite: 'lax' })
       apiClient.setAccessToken(accessToken)
       set({ accessToken })
     },
     setLoading: (isLoading) => set({ isLoading }),
     setError: (error) => set({ error }),
     resetAccessToken: () => {
-      Cookies.remove('token')
+      Cookies.remove(TOKEN_COOKIE)
       apiClient.removeAccessToken()
       set({ accessToken: '' })
     },
     reset: () => {
-      Cookies.remove('token')
+      Cookies.remove(TOKEN_COOKIE)
       apiClient.removeAccessToken()
       set({ user: null, accessToken: '', error: null })
     },
@@ -139,7 +146,9 @@ export const useAuthStore = create<AuthState>()((set, get) => {
         get().setUser(user)
         set({ isLoading: false })
       } catch (error) {
-        if (error instanceof Error && error.message.includes('401')) {
+        // Matched on status, not message text: the message now carries the
+        // server's wording, which does not contain the status code.
+        if (error instanceof ApiError && error.status === 401) {
           // Token is invalid, clear auth state
           get().reset()
         } else {

@@ -6,10 +6,11 @@ import {
   updateProduct,
   deleteProduct,
   PaginationParams,
+  ProductsRequest,
   updateProductStatus,
   getPendingQueue,
+  getModerationHistory,
 } from '../api/products-api'
-import { Product } from '../data/schema'
 
 // Query keys
 export const productKeys = {
@@ -58,8 +59,13 @@ export const useUpdateProduct = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Product> }) =>
-      updateProduct(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string
+      data: Partial<ProductsRequest> & { status?: string }
+    }) => updateProduct(id, data),
     onSuccess: (updatedProduct) => {
       // Update the product in cache
       queryClient.setQueryData(
@@ -98,8 +104,11 @@ export const useProductDecision = () => {
       id: string
       data: { status: string; reason?: string }
     }) => updateProductStatus(id, data),
-    onSuccess: () => {
+    onSuccess: (_result, { id }) => {
       queryClient.invalidateQueries({ queryKey: productKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: productKeys.detail(id) })
+      // Without this the product lingers in the review queue after a decision.
+      queryClient.invalidateQueries({ queryKey: ['product-queue'] })
     },
   })
 }
@@ -108,5 +117,13 @@ export const useProductQueue = (pagination?: PaginationParams) => {
   return useQuery({
     queryKey: ['product-queue', pagination],
     queryFn: () => getPendingQueue(pagination),
+  })
+}
+
+export const useModerationHistory = (productId: string) => {
+  return useQuery({
+    queryKey: [...productKeys.detail(productId), 'moderation-history'],
+    queryFn: () => getModerationHistory(productId),
+    enabled: !!productId,
   })
 }

@@ -1,6 +1,5 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import { AxiosError } from 'axios'
 import {
   QueryCache,
   QueryClient,
@@ -8,6 +7,7 @@ import {
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { ApiError } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
 import { handleServerError } from '@/utils/handle-server-error'
 import { FontProvider } from './context/font-context'
@@ -29,10 +29,9 @@ const queryClient = new QueryClient({
         if (failureCount >= 0 && import.meta.env.DEV) return false
         if (failureCount > 3 && import.meta.env.PROD) return false
 
-        return !(
-          error instanceof AxiosError &&
-          [401, 403].includes(error.response?.status ?? 0)
-        )
+        // Retrying an auth failure just burns requests; the credentials will
+        // not improve on their own.
+        return !(error instanceof ApiError && [401, 403].includes(error.status))
       },
       refetchOnWindowFocus: import.meta.env.PROD,
       staleTime: 10 * 1000, // 10s
@@ -41,43 +40,35 @@ const queryClient = new QueryClient({
       onError: (error) => {
         handleServerError(error)
 
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 304) {
-            toast.error('Content not modified!')
-          }
+        if (error instanceof ApiError && error.status === 304) {
+          toast.error('Content not modified!')
         }
       },
     },
   },
   queryCache: new QueryCache({
     onError: (error) => {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
+      // The API layer speaks fetch and throws ApiError, which carries the
+      // status. Matching on the message text does not work: messages come from
+      // the server's body ("Insufficient permissions"), not the status line.
+      if (!(error instanceof ApiError)) return
+
+      switch (error.status) {
+        case 401:
           toast.error('Session expired!')
           useAuthStore.getState().reset()
-          const redirect = `${router.history.location.href}`
-          router.navigate({ to: '/sign-in', search: { redirect } })
-        }
-        if (error.response?.status === 500) {
+          router.navigate({
+            to: '/sign-in',
+            search: { redirect: `${router.history.location.href}` },
+          })
+          break
+        case 403:
+          toast.error(error.message || 'You do not have access to that.')
+          break
+        case 500:
           toast.error('Internal Server Error!')
           router.navigate({ to: '/500' })
-        }
-        if (error.response?.status === 403) {
-          // router.navigate("/forbidden", { replace: true });
-        }
-      } else if (error instanceof Error) {
-        // Handle regular Error objects (from fetch API)
-        if (error.message.includes('401')) {
-          toast.error('Session expired!')
-          useAuthStore.getState().reset()
-          const redirect = `${router.history.location.href}`
-          router.navigate({ to: '/sign-in', search: { redirect } })
-        } else if (error.message.includes('500')) {
-          toast.error('Internal Server Error!')
-          router.navigate({ to: '/500' })
-        } else if (error.message.includes('403')) {
-          // router.navigate("/forbidden", { replace: true });
-        }
+          break
       }
     },
   }),

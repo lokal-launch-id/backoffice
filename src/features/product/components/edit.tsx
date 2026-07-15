@@ -1,11 +1,13 @@
 import React from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
+import { format } from 'date-fns'
+import { useUpload } from '@/hooks/use-upload'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { ProductImage } from '../data/schema'
+import { ProductFormData } from '../data/schema'
 import { useUpdateProduct } from '../hooks/use-products'
 import { useProducts } from '../stores/productsStore'
 import { ProductDialogs } from './product-dialogs'
@@ -20,6 +22,7 @@ function ProductsEditContent() {
   const { selectedProduct, isLoadingProduct, error, setSelectedProductId } =
     useProducts()
   const updateProductMutation = useUpdateProduct()
+  const { uploadImages } = useUpload()
 
   // Set the selected product ID when component mounts
   React.useEffect(() => {
@@ -28,23 +31,46 @@ function ProductsEditContent() {
     }
   }, [productId, setSelectedProductId])
 
-  const handleFormSubmit = async (data: {
-    name_en: string
-    name_id: string
-    tagline: string
-    description_en: string
-    description_id: string
-    website_url: string
-    status: 'approved' | 'pending' | 'rejected'
-    is_featured: boolean
-    features: string[]
-    tech_stack: string[]
-    pricing?: string
-    images: ProductImage[]
-  }) => {
+  // Typed from the schema rather than hand-copied: the inline duplicate this
+  // replaced had already drifted out of sync with it.
+  const handleFormSubmit = async (data: ProductFormData) => {
     if (!selectedProduct) return
     try {
-      await updateProductMutation.mutateAsync({ id: selectedProduct.id, data })
+      // Newly picked files are held as blob: URLs and need uploading; images
+      // already on the product are hosted and are kept as they are.
+      const picked = data.images.filter((image) =>
+        image.image_url.startsWith('blob:')
+      )
+      const existing = data.images
+        .filter((image) => !image.image_url.startsWith('blob:'))
+        .map((image) => image.image_url)
+      const uploaded = picked.length
+        ? (await uploadImages({ images: picked, type: 'product' })).map(
+            (image) => image.url
+          )
+        : []
+      const imageUrls = [...existing, ...uploaded]
+
+      await updateProductMutation.mutateAsync({
+        id: selectedProduct.id,
+        data: {
+          name_en: data.name_en,
+          name_id: data.name_id,
+          tagline: data.tagline,
+          description_en: data.description_en,
+          description_id: data.description_id,
+          website_url: data.website_url,
+          category_id: data.category_id,
+          features: data.features,
+          tech_stack: data.tech_stack,
+          pricing: data.pricing,
+          launch_date: data.launch_date
+            ? format(data.launch_date, 'yyyy-MM-dd')
+            : undefined,
+          logo_url: imageUrls[0],
+          image_urls: imageUrls.length ? imageUrls : undefined,
+        },
+      })
       navigate({ to: '/products/detail/$productId', params: { productId } })
     } catch (_) {
       // Handle error if needed

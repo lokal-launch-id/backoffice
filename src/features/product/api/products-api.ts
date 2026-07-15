@@ -49,6 +49,21 @@ export interface ProductQueueResponse {
   meta: PaginationMeta
 }
 
+export interface ProductModerationHistory {
+  id: string
+  product_id: string
+  admin_id: string
+  action: string
+  // Empty for approvals; moderators must supply one when rejecting.
+  reason: string
+  created_at: string
+}
+
+export interface ModerationHistoryResponse {
+  data: ProductModerationHistory[]
+  meta: PaginationMeta
+}
+
 export class ProductsApi {
   static async getProducts(
     params?: PaginationParams
@@ -84,9 +99,12 @@ export class ProductsApi {
   }
 
   // Update existing product
+  // Takes the request shape, not Partial<Product>. The API reads category_id
+  // and image_urls; a Product carries a nested `category` object and `images`
+  // records, which it silently ignores - so edits to those simply never saved.
   static async updateProduct(
     id: string,
-    productData: Partial<Omit<Product, 'id' | 'created_at' | 'updated_at'>>
+    productData: Partial<ProductsRequest> & { status?: string }
   ): Promise<Product> {
     return apiClient.patch<Product>(
       API_ENDPOINTS.products.update(id),
@@ -134,6 +152,14 @@ export class ProductsApi {
     return apiClient.get<ProductQueueResponse>(endpoint)
   }
 
+  static async getModerationHistory(
+    productId: string
+  ): Promise<ModerationHistoryResponse> {
+    return apiClient.get<ModerationHistoryResponse>(
+      `/admin/products/${productId}/moderation-histories`
+    )
+  }
+
   // static async updateProductImages(id: string, images: string[]): Promise<void> {
   //  const endpoint = ?
 
@@ -150,4 +176,5 @@ export const {
   getCategories,
   updateProductStatus,
   getPendingQueue,
+  getModerationHistory,
 } = ProductsApi

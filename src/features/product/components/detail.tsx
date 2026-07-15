@@ -1,6 +1,7 @@
 import React from 'react'
 import { useParams } from '@tanstack/react-router'
 import { showSubmittedData } from '@/utils/show-submitted-data'
+import { ProductFormData } from '../data/schema'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -24,26 +25,9 @@ function ProductsDetailContent() {
     }
   }, [productId, setSelectedProductId])
 
-  const handleFormSubmit = (data: {
-    name_en: string
-    name_id: string
-    tagline: string
-    description_en: string
-    description_id: string
-    website_url: string
-    status: 'approved' | 'pending' | 'rejected'
-    is_featured: boolean
-    features: string[]
-    tech_stack: string[]
-    pricing?: string
-    images: {
-      id: string
-      product_id: string
-      image_url: string
-      order_index: number
-      created_at: string
-    }[]
-  }) => {
+  // Typed from the schema rather than hand-copied: the inline duplicate this
+  // replaced had already drifted out of sync with it.
+  const handleFormSubmit = (data: ProductFormData) => {
     showSubmittedData(data, 'Product updated successfully:')
   }
 

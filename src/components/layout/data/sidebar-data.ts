@@ -32,8 +32,9 @@ export const sidebarData: SidebarData = {
           icon: IconLayoutDashboard,
         },
         {
+          // A collapsible group carries no url of its own (see NavCollapsible):
+          // it expands to the children below rather than navigating.
           title: 'Products',
-          url: '/products',
           icon: IconChecklist,
           items: [
             {
@@ -60,7 +61,6 @@ export const sidebarData: SidebarData = {
         },
         {
           title: 'Claps',
-          url: '/claps',
           icon: IconConfetti,
           items: [
             {

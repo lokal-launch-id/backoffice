@@ -18,7 +18,8 @@ export function ProductDetailHeader({ product }: ProductDetailHeaderProps) {
       <CardHeader className='flex flex-row items-center justify-between gap-4'>
         <div className='flex items-center gap-4'>
           <Avatar>
-            <AvatarImage src={product.user.avatar_url} />
+            {/* avatar_url is nullable in the API; AvatarImage wants string | undefined. */}
+            <AvatarImage src={product.user.avatar_url ?? undefined} />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
           <div>
@@ -116,8 +117,8 @@ export function ProductDetailHeader({ product }: ProductDetailHeaderProps) {
             {product.images && product.images.length > 0 ? (
               product.images.map((img, idx) => (
                 <img
-                  key={idx}
-                  src={img}
+                  key={img.id ?? idx}
+                  src={img.image_url}
                   alt={`Product image ${idx + 1}`}
                   className='h-32 w-32 rounded border object-cover'
                 />

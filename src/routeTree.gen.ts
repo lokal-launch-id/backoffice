@@ -40,7 +40,6 @@ import { Route as AuthenticatedSettingsAppearanceImport } from './routes/_authen
 import { Route as AuthenticatedSettingsAccountImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedProductsQueueImport } from './routes/_authenticated/products/queue'
 import { Route as AuthenticatedProductsListImport } from './routes/_authenticated/products/list'
-import { Route as AuthenticatedProductsDetailImport } from './routes/_authenticated/products/detail'
 import { Route as AuthenticatedProductsCreateImport } from './routes/_authenticated/products/create'
 import { Route as AuthenticatedClapsModerationImport } from './routes/_authenticated/claps/moderation'
 import { Route as AuthenticatedClapsAnalyticsImport } from './routes/_authenticated/claps/analytics'
@@ -239,13 +238,6 @@ const AuthenticatedProductsListRoute = AuthenticatedProductsListImport.update({
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
-const AuthenticatedProductsDetailRoute =
-  AuthenticatedProductsDetailImport.update({
-    id: '/products/detail',
-    path: '/products/detail',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-
 const AuthenticatedProductsCreateRoute =
   AuthenticatedProductsCreateImport.update({
     id: '/products/create',
@@ -283,9 +275,9 @@ const AuthenticatedProductsEditProductIdRoute =
 
 const AuthenticatedProductsDetailProductIdRoute =
   AuthenticatedProductsDetailProductIdImport.update({
-    id: '/$productId',
-    path: '/$productId',
-    getParentRoute: () => AuthenticatedProductsDetailRoute,
+    id: '/products/detail/$productId',
+    path: '/products/detail/$productId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -411,13 +403,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProductsCreateImport
       parentRoute: typeof AuthenticatedRouteImport
     }
-    '/_authenticated/products/detail': {
-      id: '/_authenticated/products/detail'
-      path: '/products/detail'
-      fullPath: '/products/detail'
-      preLoaderRoute: typeof AuthenticatedProductsDetailImport
-      parentRoute: typeof AuthenticatedRouteImport
-    }
     '/_authenticated/products/list': {
       id: '/_authenticated/products/list'
       path: '/products/list'
@@ -532,10 +517,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/products/detail/$productId': {
       id: '/_authenticated/products/detail/$productId'
-      path: '/$productId'
+      path: '/products/detail/$productId'
       fullPath: '/products/detail/$productId'
       preLoaderRoute: typeof AuthenticatedProductsDetailProductIdImport
-      parentRoute: typeof AuthenticatedProductsDetailImport
+      parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/products/edit/$productId': {
       id: '/_authenticated/products/edit/$productId'
@@ -572,21 +557,6 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
-interface AuthenticatedProductsDetailRouteChildren {
-  AuthenticatedProductsDetailProductIdRoute: typeof AuthenticatedProductsDetailProductIdRoute
-}
-
-const AuthenticatedProductsDetailRouteChildren: AuthenticatedProductsDetailRouteChildren =
-  {
-    AuthenticatedProductsDetailProductIdRoute:
-      AuthenticatedProductsDetailProductIdRoute,
-  }
-
-const AuthenticatedProductsDetailRouteWithChildren =
-  AuthenticatedProductsDetailRoute._addFileChildren(
-    AuthenticatedProductsDetailRouteChildren,
-  )
-
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -594,7 +564,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClapsAnalyticsRoute: typeof AuthenticatedClapsAnalyticsRoute
   AuthenticatedClapsModerationRoute: typeof AuthenticatedClapsModerationRoute
   AuthenticatedProductsCreateRoute: typeof AuthenticatedProductsCreateRoute
-  AuthenticatedProductsDetailRoute: typeof AuthenticatedProductsDetailRouteWithChildren
   AuthenticatedProductsListRoute: typeof AuthenticatedProductsListRoute
   AuthenticatedProductsQueueRoute: typeof AuthenticatedProductsQueueRoute
   AuthenticatedUtilitiesUploadRoute: typeof AuthenticatedUtilitiesUploadRoute
@@ -606,6 +575,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedUtilitiesIndexRoute: typeof AuthenticatedUtilitiesIndexRoute
+  AuthenticatedProductsDetailProductIdRoute: typeof AuthenticatedProductsDetailProductIdRoute
   AuthenticatedProductsEditProductIdRoute: typeof AuthenticatedProductsEditProductIdRoute
 }
 
@@ -616,8 +586,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClapsAnalyticsRoute: AuthenticatedClapsAnalyticsRoute,
   AuthenticatedClapsModerationRoute: AuthenticatedClapsModerationRoute,
   AuthenticatedProductsCreateRoute: AuthenticatedProductsCreateRoute,
-  AuthenticatedProductsDetailRoute:
-    AuthenticatedProductsDetailRouteWithChildren,
   AuthenticatedProductsListRoute: AuthenticatedProductsListRoute,
   AuthenticatedProductsQueueRoute: AuthenticatedProductsQueueRoute,
   AuthenticatedUtilitiesUploadRoute: AuthenticatedUtilitiesUploadRoute,
@@ -629,6 +597,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedUtilitiesIndexRoute: AuthenticatedUtilitiesIndexRoute,
+  AuthenticatedProductsDetailProductIdRoute:
+    AuthenticatedProductsDetailProductIdRoute,
   AuthenticatedProductsEditProductIdRoute:
     AuthenticatedProductsEditProductIdRoute,
 }
@@ -654,7 +624,6 @@ export interface FileRoutesByFullPath {
   '/claps/analytics': typeof AuthenticatedClapsAnalyticsRoute
   '/claps/moderation': typeof AuthenticatedClapsModerationRoute
   '/products/create': typeof AuthenticatedProductsCreateRoute
-  '/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
   '/products/list': typeof AuthenticatedProductsListRoute
   '/products/queue': typeof AuthenticatedProductsQueueRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -691,7 +660,6 @@ export interface FileRoutesByTo {
   '/claps/analytics': typeof AuthenticatedClapsAnalyticsRoute
   '/claps/moderation': typeof AuthenticatedClapsModerationRoute
   '/products/create': typeof AuthenticatedProductsCreateRoute
-  '/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
   '/products/list': typeof AuthenticatedProductsListRoute
   '/products/queue': typeof AuthenticatedProductsQueueRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -731,7 +699,6 @@ export interface FileRoutesById {
   '/_authenticated/claps/analytics': typeof AuthenticatedClapsAnalyticsRoute
   '/_authenticated/claps/moderation': typeof AuthenticatedClapsModerationRoute
   '/_authenticated/products/create': typeof AuthenticatedProductsCreateRoute
-  '/_authenticated/products/detail': typeof AuthenticatedProductsDetailRouteWithChildren
   '/_authenticated/products/list': typeof AuthenticatedProductsListRoute
   '/_authenticated/products/queue': typeof AuthenticatedProductsQueueRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -772,7 +739,6 @@ export interface FileRouteTypes {
     | '/claps/analytics'
     | '/claps/moderation'
     | '/products/create'
-    | '/products/detail'
     | '/products/list'
     | '/products/queue'
     | '/settings/account'
@@ -808,7 +774,6 @@ export interface FileRouteTypes {
     | '/claps/analytics'
     | '/claps/moderation'
     | '/products/create'
-    | '/products/detail'
     | '/products/list'
     | '/products/queue'
     | '/settings/account'
@@ -846,7 +811,6 @@ export interface FileRouteTypes {
     | '/_authenticated/claps/analytics'
     | '/_authenticated/claps/moderation'
     | '/_authenticated/products/create'
-    | '/_authenticated/products/detail'
     | '/_authenticated/products/list'
     | '/_authenticated/products/queue'
     | '/_authenticated/settings/account'
@@ -928,7 +892,6 @@ export const routeTree = rootRoute
         "/_authenticated/claps/analytics",
         "/_authenticated/claps/moderation",
         "/_authenticated/products/create",
-        "/_authenticated/products/detail",
         "/_authenticated/products/list",
         "/_authenticated/products/queue",
         "/_authenticated/utilities/upload",
@@ -940,6 +903,7 @@ export const routeTree = rootRoute
         "/_authenticated/products/",
         "/_authenticated/users/",
         "/_authenticated/utilities/",
+        "/_authenticated/products/detail/$productId",
         "/_authenticated/products/edit/$productId"
       ]
     },
@@ -1003,13 +967,6 @@ export const routeTree = rootRoute
     "/_authenticated/products/create": {
       "filePath": "_authenticated/products/create.tsx",
       "parent": "/_authenticated"
-    },
-    "/_authenticated/products/detail": {
-      "filePath": "_authenticated/products/detail.tsx",
-      "parent": "/_authenticated",
-      "children": [
-        "/_authenticated/products/detail/$productId"
-      ]
     },
     "/_authenticated/products/list": {
       "filePath": "_authenticated/products/list.tsx",
@@ -1077,7 +1034,7 @@ export const routeTree = rootRoute
     },
     "/_authenticated/products/detail/$productId": {
       "filePath": "_authenticated/products/detail/$productId.tsx",
-      "parent": "/_authenticated/products/detail"
+      "parent": "/_authenticated"
     },
     "/_authenticated/products/edit/$productId": {
       "filePath": "_authenticated/products/edit/$productId.tsx",

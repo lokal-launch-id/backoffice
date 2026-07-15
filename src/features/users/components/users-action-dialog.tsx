@@ -39,7 +39,13 @@ const formSchema = z
       .min(1, { message: 'Email is required.' })
       .email({ message: 'Email is invalid.' }),
     password: z.string().transform((pwd) => pwd.trim()),
-    role: z.string().min(1, { message: 'Role is required.' }),
+    // Constrained to the real roles rather than any string, so an invalid role
+    // cannot reach the API. Declared here rather than imported from
+    // data/schema: that module builds on zod/v4 while this one uses zod, and
+    // schemas from the two are not interchangeable.
+    role: z.enum(['admin', 'moderator', 'user'], {
+      errorMap: () => ({ message: 'Role is required.' }),
+    }),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
     isEdit: z.boolean(),
   })
@@ -114,7 +120,7 @@ export function UsersActionDialog({ currentRow, open }: Props) {
           last_name: '',
           username: '',
           email: '',
-          role: '',
+          role: undefined,
           password: '',
           confirmPassword: '',
           isEdit,

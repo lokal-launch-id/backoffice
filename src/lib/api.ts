@@ -15,7 +15,10 @@ export const API_ENDPOINTS = {
     create: '/products',
     update: (id: string) => `/products/${id}`,
     delete: (id: string) => `/products/${id}`,
-    updateStatus: (id: string) => `/admin/products/${id}/status`,
+    // Moderation decisions live under /moderator, not /admin: the route is open
+    // to moderators and admins alike. Pointing this at /admin 403'd every
+    // moderator who reached the queue.
+    updateStatus: (id: string) => `/moderator/products/${id}/status`,
   },
   // Users
   users: {
@@ -48,7 +51,9 @@ export const API_ENDPOINTS = {
     upload: '/upload',
   },
   upload: {
-    s3URL: '/upload/image',
+    // The API exposes a single multipart endpoint. This used to point at
+    // /upload/image, which has never existed and 404'd every upload.
+    s3URL: '/upload',
   },
 } as const
 
@@ -57,6 +62,22 @@ export const buildApiUrl = (endpoint: string): string => {
 }
 
 // Generic API client
+/**
+ * An HTTP failure that kept its status code.
+ *
+ * The client speaks fetch, not axios, so a bare Error left callers with nothing
+ * to branch on and the session-expiry handling downstream could never fire.
+ */
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string
+  ) {
+    super(message)
+    this.name = 'ApiError'
+  }
+}
+
 export class ApiClient {
   private baseUrl: string
 
@@ -124,11 +145,10 @@ export class ApiClient {
     })
 
     if (!response.ok) {
-      // Handle 401 Unauthorized - clear token and redirect to login
+      // Handle 401 Unauthorized - clear the token. The redirect is left to the
+      // QueryCache handler in main.tsx, which can reach the router.
       if (response.status === 401) {
         this.removeAccessToken()
-        // You might want to trigger a redirect to login here
-        // window.location.href = '/login'
       }
 
       // Try to parse error response body for more detailed error message
@@ -144,7 +164,7 @@ export class ApiClient {
         // If we can't parse the error response, use the default message
       }
 
-      throw new Error(errorMessage)
+      throw new ApiError(response.status, errorMessage)
     }
 
     return response.json()

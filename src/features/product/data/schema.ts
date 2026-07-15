@@ -1,10 +1,14 @@
 import { z } from 'zod'
 import { User } from '@/features/users/data/schema'
 
+// Must mirror models.ProductStatus in the API. "resubmitted" is set when a
+// maker edits a product that was rejected; leaving it out made those rows fail
+// to parse.
 export const productStatusSchema = z.union([
   z.literal('approved'),
   z.literal('pending'),
   z.literal('rejected'),
+  z.literal('resubmitted'),
 ])
 export type ProductStatus = z.infer<typeof productStatusSchema>
 

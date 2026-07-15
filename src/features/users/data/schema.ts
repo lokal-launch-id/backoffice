@@ -1,6 +1,7 @@
 import * as z from 'zod/v4'
 
-const userRoleSchema = z.union([
+// Mirrors the roles the API's middleware recognises.
+export const userRoleSchema = z.union([
   z.literal('admin'),
   z.literal('moderator'),
   z.literal('user'),

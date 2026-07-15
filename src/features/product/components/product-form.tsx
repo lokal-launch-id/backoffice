@@ -146,25 +146,26 @@ export function ProductForm({
     form.setValue('images', updatedImages)
   }
 
+  // Holds each pick as a local blob URL and appends it to the existing images.
+  // useUpload turns those blobs into real uploads on submit. This previously
+  // discarded the chosen files entirely and stored one hardcoded Cloudinary URL,
+  // so every product ended up with the same picture.
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if (files && files.length > 0) {
-      const currentImages = form.getValues('images')
-      const newImages = Array.from(files).map(() => {
-        return 'https://res.cloudinary.com/dmeupksbl/image/upload/v1751393556/indonesian-product-hunt/product/image-1751393556018_7a3c77b5.png'
-      })
-      form.setValue('images', newImages)
-      // form.setValue('images', [
-      //   ...currentImages,
-      //   ...newImages.map((image, index) => ({
-      //     id: '',
-      //     product_id: product.id,
-      //     image_url: image,
-      //     order_index: currentImages.length + index + 1,
-      //     created_at: new Date().toISOString(),
-      //   })),
-      // ])
-    }
+    if (!files || files.length === 0) return
+
+    const currentImages = form.getValues('images')
+    const newImages = Array.from(files).map((file, index) => ({
+      id: '',
+      product_id: isFromCreate ? '' : product.id,
+      image_url: URL.createObjectURL(file),
+      order_index: currentImages.length + index + 1,
+      created_at: new Date().toISOString(),
+    }))
+
+    form.setValue('images', [...currentImages, ...newImages])
+    // Allow re-picking the same file after removing it.
+    event.target.value = ''
   }
 
   const getAdminUser = () => {
