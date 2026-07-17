@@ -7,7 +7,10 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useModerationHistory } from '../hooks/use-products'
 import { useProducts } from '../stores/productsStore'
+import { ModerationHistoryTable } from './moderation-history-table'
 import { ProductDialogs } from './product-dialogs'
 import { ProductForm } from './product-form'
 
@@ -17,6 +20,12 @@ function ProductsDetailContent() {
   })
   const { selectedProduct, isLoadingProduct, error, setSelectedProductId } =
     useProducts()
+
+  const {
+    data: historyData,
+    isLoading: historyLoading,
+    error: historyError,
+  } = useModerationHistory(productId)
 
   // Set the selected product ID when component mounts
   React.useEffect(() => {
@@ -83,6 +92,18 @@ function ProductsDetailContent() {
             />
           </div>
         </div>
+        <Card className='mt-6'>
+          <CardHeader>
+            <CardTitle>Moderation History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ModerationHistoryTable
+              items={historyData?.data ?? []}
+              isLoading={historyLoading}
+              error={historyError as Error | null}
+            />
+          </CardContent>
+        </Card>
       </Main>
       <ProductDialogs />
     </>

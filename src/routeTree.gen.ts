@@ -39,6 +39,7 @@ import { Route as AuthenticatedSettingsDisplayImport } from './routes/_authentic
 import { Route as AuthenticatedSettingsAppearanceImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedProductsQueueImport } from './routes/_authenticated/products/queue'
+import { Route as AuthenticatedProductsModerationLogImport } from './routes/_authenticated/products/moderation-log'
 import { Route as AuthenticatedProductsListImport } from './routes/_authenticated/products/list'
 import { Route as AuthenticatedProductsCreateImport } from './routes/_authenticated/products/create'
 import { Route as AuthenticatedClapsModerationImport } from './routes/_authenticated/claps/moderation'
@@ -232,6 +233,13 @@ const AuthenticatedProductsQueueRoute = AuthenticatedProductsQueueImport.update(
   } as any,
 )
 
+const AuthenticatedProductsModerationLogRoute =
+  AuthenticatedProductsModerationLogImport.update({
+    id: '/products/moderation-log',
+    path: '/products/moderation-log',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
 const AuthenticatedProductsListRoute = AuthenticatedProductsListImport.update({
   id: '/products/list',
   path: '/products/list',
@@ -410,6 +418,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProductsListImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/products/moderation-log': {
+      id: '/_authenticated/products/moderation-log'
+      path: '/products/moderation-log'
+      fullPath: '/products/moderation-log'
+      preLoaderRoute: typeof AuthenticatedProductsModerationLogImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/products/queue': {
       id: '/_authenticated/products/queue'
       path: '/products/queue'
@@ -565,6 +580,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClapsModerationRoute: typeof AuthenticatedClapsModerationRoute
   AuthenticatedProductsCreateRoute: typeof AuthenticatedProductsCreateRoute
   AuthenticatedProductsListRoute: typeof AuthenticatedProductsListRoute
+  AuthenticatedProductsModerationLogRoute: typeof AuthenticatedProductsModerationLogRoute
   AuthenticatedProductsQueueRoute: typeof AuthenticatedProductsQueueRoute
   AuthenticatedUtilitiesUploadRoute: typeof AuthenticatedUtilitiesUploadRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -587,6 +603,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClapsModerationRoute: AuthenticatedClapsModerationRoute,
   AuthenticatedProductsCreateRoute: AuthenticatedProductsCreateRoute,
   AuthenticatedProductsListRoute: AuthenticatedProductsListRoute,
+  AuthenticatedProductsModerationLogRoute:
+    AuthenticatedProductsModerationLogRoute,
   AuthenticatedProductsQueueRoute: AuthenticatedProductsQueueRoute,
   AuthenticatedUtilitiesUploadRoute: AuthenticatedUtilitiesUploadRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
@@ -625,6 +643,7 @@ export interface FileRoutesByFullPath {
   '/claps/moderation': typeof AuthenticatedClapsModerationRoute
   '/products/create': typeof AuthenticatedProductsCreateRoute
   '/products/list': typeof AuthenticatedProductsListRoute
+  '/products/moderation-log': typeof AuthenticatedProductsModerationLogRoute
   '/products/queue': typeof AuthenticatedProductsQueueRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -661,6 +680,7 @@ export interface FileRoutesByTo {
   '/claps/moderation': typeof AuthenticatedClapsModerationRoute
   '/products/create': typeof AuthenticatedProductsCreateRoute
   '/products/list': typeof AuthenticatedProductsListRoute
+  '/products/moderation-log': typeof AuthenticatedProductsModerationLogRoute
   '/products/queue': typeof AuthenticatedProductsQueueRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -700,6 +720,7 @@ export interface FileRoutesById {
   '/_authenticated/claps/moderation': typeof AuthenticatedClapsModerationRoute
   '/_authenticated/products/create': typeof AuthenticatedProductsCreateRoute
   '/_authenticated/products/list': typeof AuthenticatedProductsListRoute
+  '/_authenticated/products/moderation-log': typeof AuthenticatedProductsModerationLogRoute
   '/_authenticated/products/queue': typeof AuthenticatedProductsQueueRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -740,6 +761,7 @@ export interface FileRouteTypes {
     | '/claps/moderation'
     | '/products/create'
     | '/products/list'
+    | '/products/moderation-log'
     | '/products/queue'
     | '/settings/account'
     | '/settings/appearance'
@@ -775,6 +797,7 @@ export interface FileRouteTypes {
     | '/claps/moderation'
     | '/products/create'
     | '/products/list'
+    | '/products/moderation-log'
     | '/products/queue'
     | '/settings/account'
     | '/settings/appearance'
@@ -812,6 +835,7 @@ export interface FileRouteTypes {
     | '/_authenticated/claps/moderation'
     | '/_authenticated/products/create'
     | '/_authenticated/products/list'
+    | '/_authenticated/products/moderation-log'
     | '/_authenticated/products/queue'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -893,6 +917,7 @@ export const routeTree = rootRoute
         "/_authenticated/claps/moderation",
         "/_authenticated/products/create",
         "/_authenticated/products/list",
+        "/_authenticated/products/moderation-log",
         "/_authenticated/products/queue",
         "/_authenticated/utilities/upload",
         "/_authenticated/apps/",
@@ -970,6 +995,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/products/list": {
       "filePath": "_authenticated/products/list.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/products/moderation-log": {
+      "filePath": "_authenticated/products/moderation-log.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/products/queue": {

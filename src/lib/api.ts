@@ -27,7 +27,11 @@ export const API_ENDPOINTS = {
     detail: (id: string) => `/users/${id}`,
     profile: '/users/profile',
     delete: (id: string) => `/admin/users/${id}`,
-    update: (id: string) => `/users/${id}`,
+    // Admin edits go through the admin route (role/maker/verified). The old
+    // `/users/${id}` target was the ownership-scoped profile PATCH and could
+    // not change role or verification.
+    update: (id: string) => `/admin/users/${id}`,
+    approve: (id: string) => `/admin/users/${id}/approve`,
     updateOwn: '/users/me',
   },
   // Categories

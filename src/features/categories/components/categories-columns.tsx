@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { ColumnDef } from '@tanstack/react-table'
 import { Category } from '../data/schema'
+import { CategoriesRowActions } from './categories-row-actions'
 
 export const categoriesColumns: ColumnDef<Category>[] = [
   {
@@ -47,5 +48,10 @@ export const categoriesColumns: ColumnDef<Category>[] = [
       return format(new Date(date), 'yyyy-MM-dd')
     },
     meta: { className: '' },
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => <CategoriesRowActions row={row} />,
+    meta: { className: 'text-right' },
   },
 ]

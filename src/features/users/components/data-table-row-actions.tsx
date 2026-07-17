@@ -1,6 +1,12 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { Row } from '@tanstack/react-table'
-import { IconEdit, IconMail, IconTrash } from '@tabler/icons-react'
+import {
+  IconCircleCheck,
+  IconEdit,
+  IconMail,
+  IconTrash,
+} from '@tabler/icons-react'
+import { toast } from 'sonner'
 import { useAuth } from '@/stores/authStore'
 import { useUsers } from '@/stores/usersStore'
 import { Button } from '@/components/ui/button'
@@ -13,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { User } from '../data/schema'
+import { useApproveUser } from '../hooks/use-users'
 
 interface DataTableRowActionsProps {
   row: Row<User>
@@ -21,6 +28,17 @@ interface DataTableRowActionsProps {
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { setOpenDialog, setCurrentRow, resendVerificationEmail } = useUsers()
   const { user } = useAuth()
+  const approveUserMutation = useApproveUser()
+
+  const handleApprove = async () => {
+    try {
+      await approveUserMutation.mutateAsync(row.original.id)
+      toast.success('User verified')
+    } catch {
+      toast.error('Failed to verify user')
+    }
+  }
+
   return (
     <>
       <DropdownMenu modal={false}>
@@ -58,6 +76,18 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               <IconMail size={16} />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
+
+          {user?.role === 'admin' && !row.original.is_verified && (
+            <DropdownMenuItem
+              disabled={approveUserMutation.isPending}
+              onClick={handleApprove}
+            >
+              Verify User
+              <DropdownMenuShortcut>
+                <IconCircleCheck size={16} />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          )}
 
           {user?.role === 'admin' && (
             <>

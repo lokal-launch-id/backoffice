@@ -4,6 +4,7 @@ import {
   getUser,
   createUser,
   updateUser,
+  approveUser,
   deleteUser,
   PaginationParams,
   resendVerificationEmail,
@@ -65,6 +66,19 @@ const useUpdateUser = () => {
   })
 }
 
+// Hook for approving (verifying) a user
+const useApproveUser = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => approveUser(id),
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData(userKeys.detail(updatedUser.id), updatedUser)
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() })
+    },
+  })
+}
+
 // Hook for deleting a user
 const useDeleteUser = () => {
   const queryClient = useQueryClient()
@@ -95,6 +109,7 @@ export {
   useUser,
   useCreateUser,
   useUpdateUser,
+  useApproveUser,
   useDeleteUser,
   useResendVerificationEmail,
 }

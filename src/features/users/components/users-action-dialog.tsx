@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { userTypes } from '../data/data'
@@ -46,6 +47,9 @@ const formSchema = z
     role: z.enum(['admin', 'moderator', 'user'], {
       errorMap: () => ({ message: 'Role is required.' }),
     }),
+    // Optional so the create path (which doesn't render these) still validates.
+    is_indonesian_maker: z.boolean().optional(),
+    is_verified: z.boolean().optional(),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
     isEdit: z.boolean(),
   })
@@ -130,14 +134,18 @@ export function UsersActionDialog({ currentRow, open }: Props) {
   const onSubmit = async (values: UserForm) => {
     try {
       if (isEdit && currentRow) {
+        // email is intentionally omitted: it is the login identity and changing
+        // it needs a re-verification flow the backend does not have, so the
+        // admin edit endpoint ignores it.
         await updateUserMutation.mutateAsync({
           id: currentRow.id,
           data: {
             first_name: values.first_name,
             last_name: values.last_name,
             username: values.username,
-            email: values.email,
             role: values.role,
+            is_indonesian_maker: values.is_indonesian_maker,
+            is_verified: values.is_verified,
           },
         })
         showSubmittedData(values, 'User updated successfully:')
@@ -257,6 +265,7 @@ export function UsersActionDialog({ currentRow, open }: Props) {
                         placeholder='john@example.com'
                         className='col-span-4'
                         autoComplete='off'
+                        disabled={isEdit}
                         {...field}
                       />
                     </FormControl>
@@ -288,6 +297,50 @@ export function UsersActionDialog({ currentRow, open }: Props) {
                   </FormItem>
                 )}
               />
+              {isEdit && (
+                <FormField
+                  control={form.control}
+                  name='is_indonesian_maker'
+                  render={({ field }) => (
+                    <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                      <FormLabel className='col-span-2 text-right'>
+                        Indonesian Maker
+                      </FormLabel>
+                      <FormControl>
+                        <div className='col-span-4'>
+                          <Switch
+                            checked={!!field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className='col-span-4 col-start-3' />
+                    </FormItem>
+                  )}
+                />
+              )}
+              {isEdit && (
+                <FormField
+                  control={form.control}
+                  name='is_verified'
+                  render={({ field }) => (
+                    <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                      <FormLabel className='col-span-2 text-right'>
+                        Verified
+                      </FormLabel>
+                      <FormControl>
+                        <div className='col-span-4'>
+                          <Switch
+                            checked={!!field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className='col-span-4 col-start-3' />
+                    </FormItem>
+                  )}
+                />
+              )}
               {!isEdit && (
                 <FormField
                   control={form.control}

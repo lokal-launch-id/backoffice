@@ -10,6 +10,7 @@ import {
   updateProductStatus,
   getPendingQueue,
   getModerationHistory,
+  getAllModerationHistory,
 } from '../api/products-api'
 
 // Query keys
@@ -125,5 +126,12 @@ export const useModerationHistory = (productId: string) => {
     queryKey: [...productKeys.detail(productId), 'moderation-history'],
     queryFn: () => getModerationHistory(productId),
     enabled: !!productId,
+  })
+}
+
+export const useAllModerationHistory = (pagination?: PaginationParams) => {
+  return useQuery({
+    queryKey: ['moderation-history', 'all', pagination],
+    queryFn: () => getAllModerationHistory(pagination),
   })
 }

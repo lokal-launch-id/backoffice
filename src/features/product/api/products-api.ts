@@ -160,6 +160,23 @@ export class ProductsApi {
     )
   }
 
+  // Global moderation log across all products.
+  static async getAllModerationHistory(
+    params?: PaginationParams
+  ): Promise<ModerationHistoryResponse> {
+    const searchParams = new URLSearchParams()
+    if (params?.page) {
+      searchParams.append('page', params.page.toString())
+    }
+    if (params?.limit) {
+      searchParams.append('limit', params.limit.toString())
+    }
+    const endpoint =
+      '/admin/moderation-histories' +
+      (searchParams.toString() ? `?${searchParams.toString()}` : '')
+    return apiClient.get<ModerationHistoryResponse>(endpoint)
+  }
+
   // static async updateProductImages(id: string, images: string[]): Promise<void> {
   //  const endpoint = ?
 
@@ -177,4 +194,5 @@ export const {
   updateProductStatus,
   getPendingQueue,
   getModerationHistory,
+  getAllModerationHistory,
 } = ProductsApi

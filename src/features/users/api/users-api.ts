@@ -55,9 +55,17 @@ export class UsersApi {
     return apiClient.post<User>(API_ENDPOINTS.users.create, userData)
   }
 
-  // Update existing user
+  // Update existing user (admin edit: role / maker / verified / profile)
   static async updateUser(id: string, userData: Partial<User>): Promise<User> {
-    return apiClient.put<User>(API_ENDPOINTS.users.detail(id), userData)
+    return apiClient.patch<User>(
+      API_ENDPOINTS.users.update(id),
+      userData as Record<string, unknown>
+    )
+  }
+
+  // Approve a user — marks their email verified so they can log in.
+  static async approveUser(id: string): Promise<User> {
+    return apiClient.patch<User>(API_ENDPOINTS.users.approve(id))
   }
 
   // Delete user
@@ -78,6 +86,7 @@ export const {
   getUser,
   createUser,
   updateUser,
+  approveUser,
   deleteUser,
   resendVerificationEmail,
 } = UsersApi
