@@ -5,6 +5,7 @@ import {
   IconEdit,
   IconMail,
   IconTrash,
+  IconUserCheck,
 } from '@tabler/icons-react'
 import { toast } from 'sonner'
 import { useAuth } from '@/stores/authStore'
@@ -19,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { User } from '../data/schema'
-import { useApproveUser } from '../hooks/use-users'
+import { useApproveUser, useUpdateUser } from '../hooks/use-users'
 
 interface DataTableRowActionsProps {
   row: Row<User>
@@ -29,6 +30,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { setOpenDialog, setCurrentRow, resendVerificationEmail } = useUsers()
   const { user } = useAuth()
   const approveUserMutation = useApproveUser()
+  const updateUserMutation = useUpdateUser()
 
   const handleApprove = async () => {
     try {
@@ -36,6 +38,19 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       toast.success('User verified')
     } catch {
       toast.error('Failed to verify user')
+    }
+  }
+
+  // Curated-alpha access: grant the user entry to the app (also verifies them).
+  const handleApproveForAlpha = async () => {
+    try {
+      await updateUserMutation.mutateAsync({
+        id: row.original.id,
+        data: { is_approved: true },
+      })
+      toast.success('User approved for the alpha')
+    } catch {
+      toast.error('Failed to approve user')
     }
   }
 
@@ -85,6 +100,18 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               Verify User
               <DropdownMenuShortcut>
                 <IconCircleCheck size={16} />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          )}
+
+          {user?.role === 'admin' && row.original.is_approved === false && (
+            <DropdownMenuItem
+              disabled={updateUserMutation.isPending}
+              onClick={handleApproveForAlpha}
+            >
+              Approve for alpha
+              <DropdownMenuShortcut>
+                <IconUserCheck size={16} />
               </DropdownMenuShortcut>
             </DropdownMenuItem>
           )}

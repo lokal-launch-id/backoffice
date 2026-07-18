@@ -107,6 +107,35 @@ export const columns: ColumnDef<User>[] = [
     enableSorting: false,
   },
   {
+    accessorKey: 'is_approved',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Alpha' />
+    ),
+    cell: ({ row }) => {
+      const isApproved = row.original.is_approved
+      const note = row.original.waitlist_note
+      return (
+        <div className='flex max-w-[220px] flex-col gap-1'>
+          <Badge
+            variant='outline'
+            className={cn(
+              'w-fit capitalize',
+              isApproved ? 'text-green-600' : 'text-amber-600'
+            )}
+          >
+            {isApproved ? 'Approved' : 'Waitlisted'}
+          </Badge>
+          {!isApproved && note && (
+            <span className='text-muted-foreground truncate text-xs' title={note}>
+              {note}
+            </span>
+          )}
+        </div>
+      )
+    },
+    enableSorting: false,
+  },
+  {
     accessorKey: 'role',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Role' />

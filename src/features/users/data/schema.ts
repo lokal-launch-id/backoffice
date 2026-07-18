@@ -17,6 +17,9 @@ const userSchema = z.object({
   avatar_url: z.string().nullable(),
   is_indonesian_maker: z.boolean(),
   is_verified: z.boolean(),
+  // Curated-alpha access gate: unapproved (waitlisted) users can't log in.
+  is_approved: z.boolean().optional(),
+  waitlist_note: z.string().nullish(),
   role: userRoleSchema,
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
