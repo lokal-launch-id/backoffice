@@ -26,6 +26,11 @@ export interface ProductsRequest {
   features: string[]
   tech_stack: string[]
   pricing?: string
+  price_model?: 'free' | 'one_time' | 'subscription' | 'custom' | ''
+  price_amount_idr?: number | null
+  price_period?: 'month' | 'year' | ''
+  accepts_local_payment?: boolean
+  is_indonesian_spotlight?: boolean
   launch_date?: string
   image_urls: string[]
 }

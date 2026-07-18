@@ -79,9 +79,14 @@ export function ProductForm({
     website_url: product.website_url,
     status: product.status,
     is_featured: product.is_featured,
+    is_indonesian_spotlight: product.is_indonesian_spotlight ?? false,
     features: product.features || [],
     tech_stack: product.tech_stack || [],
     pricing: typeof product.pricing === 'string' ? product.pricing : undefined,
+    price_model: product.price_model ?? '',
+    price_amount_idr: product.price_amount_idr ?? null,
+    price_period: product.price_period ?? '',
+    accepts_local_payment: product.accepts_local_payment ?? false,
     // images: product.images as unknown as Partial<ProductImage>[],
     images:
       (product.images as unknown as Partial<ProductImage>[])?.map((image) => ({
@@ -105,6 +110,9 @@ export function ProductForm({
     defaultValues: getInitialValues(),
   })
 
+  // Drives which structured pricing inputs are shown (amount / period).
+  const priceModel = form.watch('price_model')
+
   // Reset form when product changes OR when entering edit mode
   useEffect(() => {
     const initialValues = getInitialValues()
@@ -117,8 +125,14 @@ export function ProductForm({
     console.log('Form submitted with data:', data)
     console.log('Form errors:', form.formState.errors)
     if (onSubmit) {
+      // Send pricing as a coherent group: amount only rides with paid models,
+      // period only with subscription, matching the API's cross-field rules.
+      const paid =
+        data.price_model === 'one_time' || data.price_model === 'subscription'
       onSubmit({
         ...data,
+        price_amount_idr: paid ? (data.price_amount_idr ?? null) : null,
+        price_period: data.price_model === 'subscription' ? data.price_period : '',
         launch_date: data.launch_date
           ? format(data.launch_date, 'yyyy-MM-dd')
           : undefined,
@@ -475,18 +489,149 @@ export function ProductForm({
 
             <FormField
               control={form.control}
+              name='is_indonesian_spotlight'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-start space-y-0 space-x-3'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={!isEditing}
+                    />
+                  </FormControl>
+                  <div className='space-y-1 leading-none'>
+                    <FormLabel>Solusi Nusantara (Indonesia Spotlight)</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name='pricing'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pricing</FormLabel>
+                  <FormLabel>Pricing note (free text, legacy)</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={!isEditing}
-                      placeholder='Enter pricing information'
+                      placeholder='Optional free-text note'
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Structured Harga Rakyat pricing */}
+            <div className='grid grid-cols-1 gap-4 lg:grid-cols-3'>
+              <FormField
+                control={form.control}
+                name='price_model'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price model</FormLabel>
+                    <Select
+                      value={field.value || 'none'}
+                      onValueChange={(v) =>
+                        field.onChange(v === 'none' ? '' : v)
+                      }
+                      disabled={!isEditing}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Not specified' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value='none'>Not specified</SelectItem>
+                        <SelectItem value='free'>Free</SelectItem>
+                        <SelectItem value='one_time'>One-time</SelectItem>
+                        <SelectItem value='subscription'>
+                          Subscription
+                        </SelectItem>
+                        <SelectItem value='custom'>Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {(priceModel === 'one_time' || priceModel === 'subscription') && (
+                <FormField
+                  control={form.control}
+                  name='price_amount_idr'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount (IDR)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type='number'
+                          min={0}
+                          disabled={!isEditing}
+                          placeholder='49000'
+                          value={field.value ?? ''}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === ''
+                                ? null
+                                : Number(e.target.value)
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {priceModel === 'subscription' && (
+                <FormField
+                  control={form.control}
+                  name='price_period'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Billing period</FormLabel>
+                      <Select
+                        value={field.value || 'month'}
+                        onValueChange={field.onChange}
+                        disabled={!isEditing}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value='month'>Month</SelectItem>
+                          <SelectItem value='year'>Year</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+
+            <FormField
+              control={form.control}
+              name='accepts_local_payment'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-start space-y-0 space-x-3'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={!isEditing}
+                    />
+                  </FormControl>
+                  <div className='space-y-1 leading-none'>
+                    <FormLabel>Accepts local payment (Bayar Lokal)</FormLabel>
+                  </div>
                 </FormItem>
               )}
             />

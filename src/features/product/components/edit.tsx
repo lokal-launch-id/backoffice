@@ -64,6 +64,11 @@ function ProductsEditContent() {
           features: data.features,
           tech_stack: data.tech_stack,
           pricing: data.pricing,
+          price_model: data.price_model ?? '',
+          price_amount_idr: data.price_amount_idr ?? null,
+          price_period: data.price_period ?? '',
+          accepts_local_payment: data.accepts_local_payment ?? false,
+          is_indonesian_spotlight: data.is_indonesian_spotlight ?? false,
           launch_date: data.launch_date
             ? format(data.launch_date, 'yyyy-MM-dd')
             : undefined,

@@ -68,6 +68,23 @@ export const productFormSchema = z.object({
     .string()
     .max(100, { message: 'Pricing must be at most 100 characters.' })
     .optional(),
+  // Structured "Harga Rakyat" pricing. '' means "not specified"; the cross-field
+  // rules (amount for paid models, period for subscription) are enforced by the
+  // superRefine below, mirroring the API's ValidatePricingFields.
+  price_model: z
+    .enum(['free', 'one_time', 'subscription', 'custom'])
+    .or(z.literal(''))
+    .optional(),
+  price_amount_idr: z
+    .number()
+    .int()
+    .nonnegative()
+    .max(100000000000, { message: 'Amount is too large.' })
+    .nullable()
+    .optional(),
+  price_period: z.enum(['month', 'year']).or(z.literal('')).optional(),
+  accepts_local_payment: z.boolean().optional(),
+  is_indonesian_spotlight: z.boolean().optional(),
   images: z.array(
     z.object({
       id: z.string(),
@@ -80,6 +97,22 @@ export const productFormSchema = z.object({
   launch_date: z.date().optional(),
   category_id: z.string().optional(),
   category: z.string().optional(),
+}).superRefine((data, ctx) => {
+  const paid = data.price_model === 'one_time' || data.price_model === 'subscription'
+  if (paid && !(data.price_amount_idr && data.price_amount_idr > 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['price_amount_idr'],
+      message: 'Amount is required for paid pricing.',
+    })
+  }
+  if (data.price_model === 'subscription' && !data.price_period) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['price_period'],
+      message: 'Billing period is required for a subscription.',
+    })
+  }
 })
 
 export type ProductFormData = z.infer<typeof productFormSchema>
@@ -125,9 +158,14 @@ export interface Product {
   category: Category
   user: Partial<User>
   is_featured: boolean
+  is_indonesian_spotlight?: boolean
   features: string[]
   tech_stack: string[]
   pricing: string
+  price_model?: 'free' | 'one_time' | 'subscription' | 'custom'
+  price_amount_idr?: number | null
+  price_period?: 'month' | 'year'
+  accepts_local_payment?: boolean
   user_clapped: boolean
   user_claps: number
   logo_url: string
