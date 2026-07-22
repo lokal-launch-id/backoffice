@@ -831,7 +831,7 @@ export function ProductForm({
                 <Button type='button' variant='outline' onClick={handleCancel}>
                   Cancel
                 </Button>
-                <Button type='submit' disabled={!form.formState.isValid}>
+                <Button type='submit' disabled={form.formState.isSubmitting}>
                   Save Changes
                 </Button>
               </div>
