@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
+import { Turnstile, TURNSTILE_SITE_KEY } from '@/components/turnstile'
 
 type UserAuthFormProps = HTMLAttributes<HTMLFormElement>
 
@@ -38,6 +39,7 @@ const formSchema = z.object({
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState('')
   const { login } = useAuth()
   const navigate = useNavigate()
 
@@ -51,9 +53,13 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
   const onSubmit = useCallback(
     async (data: z.infer<typeof formSchema>) => {
+      if (TURNSTILE_SITE_KEY && !captchaToken) {
+        toast.error('Please complete the verification challenge.')
+        return
+      }
       setIsLoading(true)
       try {
-        await login(data.email, data.password)
+        await login(data.email, data.password, captchaToken)
         navigate({ to: '/' })
       } catch (error) {
         toast.error('Login error: ' + error)
@@ -61,7 +67,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         setIsLoading(false)
       }
     },
-    [login, navigate]
+    [login, navigate, captchaToken]
   )
 
   return (
@@ -103,6 +109,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             </FormItem>
           )}
         />
+        <Turnstile onVerify={setCaptchaToken} />
         <Button className='mt-2' disabled={isLoading}>
           Login
         </Button>

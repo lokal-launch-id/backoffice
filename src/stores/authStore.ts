@@ -38,7 +38,11 @@ interface AuthState {
   reset: () => void
 
   // Auth operations
-  login: (email: string, password: string) => Promise<void>
+  login: (
+    email: string,
+    password: string,
+    captchaToken?: string
+  ) => Promise<void>
   logout: () => Promise<void>
   getCurrentUser: () => Promise<void>
 
@@ -101,12 +105,16 @@ export const useAuthStore = create<AuthState>()((set, get) => {
     },
 
     // Auth operations
-    login: async (email: string, password: string) => {
+    login: async (email: string, password: string, captchaToken?: string) => {
       set({ isLoading: true, error: null })
       try {
+        // The backend enforces Cloudflare Turnstile on /login where a secret is
+        // configured (prod). On staging CAPTCHA is disabled, so the token is
+        // simply absent and ignored.
         const response = await apiClient.post<LoginResponse>('/login', {
           email,
           password,
+          captcha_token: captchaToken ?? '',
         })
         const { token, user } = response
 
