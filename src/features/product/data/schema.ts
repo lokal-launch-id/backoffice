@@ -48,7 +48,6 @@ export const productFormSchema = z.object({
     .array(
       z
         .string()
-        .min(5, { message: 'Each feature must be at least 5 characters.' })
         .max(100, { message: 'Each feature must be at most 100 characters.' })
     )
     .max(20, { message: 'You can add up to 20 features.' }),
