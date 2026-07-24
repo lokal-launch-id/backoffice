@@ -2,6 +2,8 @@ import { HTMLAttributes, useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { apiClient } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -25,20 +27,41 @@ const formSchema = z.object({
 
 export function ForgotPasswordForm({ className, ...props }: ForgotFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isSent, setIsSent] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '' },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    // eslint-disable-next-line no-console
-    console.log(data)
-
-    setTimeout(() => {
+    try {
+      // The backend always responds success here regardless of whether the
+      // email exists, so we never reveal which addresses are registered.
+      await apiClient.post('/auth/forgot-password', { email: data.email })
+      setIsSent(true)
+    } catch (error) {
+      toast.error('Could not send the reset link: ' + error)
+    } finally {
       setIsLoading(false)
-    }, 3000)
+    }
+  }
+
+  if (isSent) {
+    return (
+      <div className={cn('grid gap-2 text-sm', className)}>
+        <p>
+          If an account exists for that email, we've sent a password reset link.
+          Check your inbox and follow the link to choose a new password, then
+          come back here to sign in.
+        </p>
+        <p className='text-muted-foreground'>
+          The link opens on the main LokalLaunch site — it resets the same
+          account you use here.
+        </p>
+      </div>
+    )
   }
 
   return (
