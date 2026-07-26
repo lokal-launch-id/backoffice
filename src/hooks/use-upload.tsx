@@ -18,6 +18,14 @@ export interface UploadUrl {
   url: string
 }
 
+const EXT_BY_MIME: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/gif': 'gif',
+  'image/webp': 'webp',
+  'image/bmp': 'bmp',
+}
+
 export function useUpload() {
   const uploadImages = async ({
     images,
@@ -32,8 +40,16 @@ export function useUpload() {
         const response = await fetch(image.image_url!)
         const blob = await response.blob()
 
-        const file = new File([blob], `image-${Date.now()}.jpg`, {
-          type: blob.type || 'image/jpeg',
+        const mime = blob.type || 'image/jpeg'
+        const ext = EXT_BY_MIME[mime]
+        if (!ext) {
+          throw new Error(
+            `Unsupported image format: ${mime}. Use JPG, PNG, GIF, WebP, or BMP.`
+          )
+        }
+
+        const file = new File([blob], `image-${Date.now()}.${ext}`, {
+          type: mime,
         })
 
         const formData = new FormData()

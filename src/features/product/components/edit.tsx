@@ -1,6 +1,8 @@
 import React from 'react'
-import { useParams, useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
+import { useParams, useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
+import { handleServerError } from '@/utils/handle-server-error'
 import { useUpload } from '@/hooks/use-upload'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -76,9 +78,10 @@ function ProductsEditContent() {
           image_urls: imageUrls.length ? imageUrls : undefined,
         },
       })
+      toast.success('Product updated')
       navigate({ to: '/products/detail/$productId', params: { productId } })
-    } catch (_) {
-      // Handle error if needed
+    } catch (error) {
+      handleServerError(error)
     }
   }
 

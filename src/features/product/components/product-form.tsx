@@ -132,7 +132,8 @@ export function ProductForm({
       onSubmit({
         ...data,
         price_amount_idr: paid ? (data.price_amount_idr ?? null) : null,
-        price_period: data.price_model === 'subscription' ? data.price_period : '',
+        price_period:
+          data.price_model === 'subscription' ? data.price_period : '',
         launch_date: data.launch_date
           ? format(data.launch_date, 'yyyy-MM-dd')
           : undefined,
@@ -500,7 +501,9 @@ export function ProductForm({
                     />
                   </FormControl>
                   <div className='space-y-1 leading-none'>
-                    <FormLabel>Solusi Nusantara (Indonesia Spotlight)</FormLabel>
+                    <FormLabel>
+                      Solusi Nusantara (Indonesia Spotlight)
+                    </FormLabel>
                   </div>
                 </FormItem>
               )}
@@ -793,7 +796,7 @@ export function ProductForm({
                       id='images'
                       type='file'
                       multiple
-                      accept='image/*'
+                      accept='image/jpeg,image/png,image/gif,image/webp,image/bmp'
                       onChange={handleImageUpload}
                       className='cursor-pointer'
                     />
