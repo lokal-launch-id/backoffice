@@ -71,6 +71,7 @@ function ProductsEditContent() {
           price_period: data.price_period || undefined,
           accepts_local_payment: data.accepts_local_payment ?? false,
           is_indonesian_spotlight: data.is_indonesian_spotlight ?? false,
+          is_featured: data.is_featured ?? false,
           launch_date: data.launch_date
             ? format(data.launch_date, 'yyyy-MM-dd')
             : undefined,

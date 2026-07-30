@@ -31,6 +31,8 @@ export interface ProductsRequest {
   price_period?: 'month' | 'year' | ''
   accepts_local_payment?: boolean
   is_indonesian_spotlight?: boolean
+  // Editorial flag: the API only accepts it from admins and moderators.
+  is_featured?: boolean
   launch_date?: string
   image_urls: string[]
 }
