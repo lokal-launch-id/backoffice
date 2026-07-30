@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
 import { Product } from '../data/schema'
 import { useProducts } from '../stores/productsStore'
+import { DataTableRowActions } from './data-table-row-actions'
 
 // Separate component to use React hooks
 function ProductNameCell({ product }: { product: Product }) {
@@ -75,5 +76,14 @@ export const productsColumns: ColumnDef<Product>[] = [
         <span title='Not Featured'>—</span>
       ),
     meta: { className: 'text-center' },
+  },
+  {
+    id: 'actions',
+    cell: DataTableRowActions,
+    // py-0 matters: TableCell is p-2 and the menu trigger is h-8, so with the
+    // default padding this cell is 48px against ~36px for the text cells and
+    // every row in the table grows to match it. Dropping the vertical padding
+    // lets the button set the height without adding to it.
+    meta: { className: 'w-12 py-0' },
   },
 ]

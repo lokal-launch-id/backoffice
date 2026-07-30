@@ -88,7 +88,13 @@ export const useDeleteProduct = () => {
     onSuccess: (_, deletedId) => {
       // Remove the product from cache
       queryClient.removeQueries({ queryKey: productKeys.detail(deletedId) })
-      // Invalidate products list
+    },
+    // Refetch on failure too, not just on success. The failure worth handling
+    // is a row the list still shows after the product is already gone: the
+    // delete comes back 404, and without this the stale row stays on screen
+    // inviting the same click again. Refetching resolves it either way, and on
+    // a 403 it costs one harmless request.
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.lists() })
     },
   })

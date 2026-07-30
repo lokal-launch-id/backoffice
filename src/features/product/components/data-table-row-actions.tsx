@@ -7,7 +7,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Product } from '../data/schema'
@@ -55,6 +54,11 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        {/*
+          Kept below the separator, away from Hide. Hide is the one a curator
+          reaches for daily and Delete is the irreversible neighbour, so they
+          should not sit adjacent in a menu opened in a hurry.
+        */}
         <DropdownMenuItem
           onClick={() => {
             setCurrentRow(product)
@@ -63,7 +67,6 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         >
           <IconTrash className='text-destructive mr-2 h-4 w-4' />
           <span className='text-destructive'>Delete</span>
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
