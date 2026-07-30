@@ -171,6 +171,17 @@ export class ApiClient {
       throw new ApiError(response.status, errorMessage)
     }
 
+    // A 204 carries no body, so response.json() would throw "Unexpected end of
+    // JSON input" and turn a successful request into a rejected promise. That
+    // is how DELETE looked broken from the UI while the server was returning
+    // 204 and the row really was gone: the success handler never ran, so no
+    // toast, no dialog close, no refetch. Checked by status and by an explicit
+    // zero length rather than by method, so any endpoint that answers with an
+    // empty body behaves.
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+      return undefined as T
+    }
+
     return response.json()
   }
 
