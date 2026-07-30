@@ -1,4 +1,4 @@
-# Lokal Launch Backoffice Dashboard
+# LokaLaunch Backoffice Dashboard
 
 Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
 

@@ -57,7 +57,7 @@ export function ForgotPasswordForm({ className, ...props }: ForgotFormProps) {
           come back here to sign in.
         </p>
         <p className='text-muted-foreground'>
-          The link opens on the main LokalLaunch site — it resets the same
+          The link opens on the main LokaLaunch site — it resets the same
           account you use here.
         </p>
       </div>
