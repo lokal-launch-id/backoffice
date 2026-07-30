@@ -1,6 +1,6 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { Row } from '@tanstack/react-table'
-import { IconEdit, IconTrash } from '@tabler/icons-react'
+import { IconEdit, IconEye, IconEyeOff, IconTrash } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -37,6 +37,22 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           }}
         >
           <IconEdit className='mr-2 h-4 w-4' /> Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentRow(product)
+            setOpen('hide')
+          }}
+        >
+          {product.status === 'hidden' ? (
+            <>
+              <IconEye className='mr-2 h-4 w-4' /> Publish
+            </>
+          ) : (
+            <>
+              <IconEyeOff className='mr-2 h-4 w-4' /> Hide from site
+            </>
+          )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

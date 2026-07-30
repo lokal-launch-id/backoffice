@@ -9,6 +9,7 @@ export const productStatusSchema = z.union([
   z.literal('pending'),
   z.literal('rejected'),
   z.literal('resubmitted'),
+  z.literal('hidden'),
 ])
 export type ProductStatus = z.infer<typeof productStatusSchema>
 

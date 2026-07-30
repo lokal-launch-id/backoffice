@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { Product } from '../data/schema'
 import { useProduct } from '../hooks/use-products'
 
-type ProductsDialogType = 'add' | 'edit' | 'delete'
+type ProductsDialogType = 'add' | 'edit' | 'delete' | 'hide'
 
 interface ProductsState {
   // Dialog state

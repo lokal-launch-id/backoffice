@@ -1,6 +1,7 @@
 import { useProducts } from '../stores/productsStore'
 import { ProductActionDialog } from './product-action-dialog'
 import { ProductDeleteDialog } from './product-delete-dialog'
+import { ProductHideDialog } from './product-hide-dialog'
 
 export function ProductDialogs() {
   const { open, setOpen, currentRow, setCurrentRow } = useProducts()
@@ -18,6 +19,17 @@ export function ProductDialogs() {
             open={open === 'edit'}
             onOpenChange={() => {
               setOpen('edit')
+              setTimeout(() => {
+                setCurrentRow(null)
+              }, 500)
+            }}
+            currentRow={currentRow}
+          />
+          <ProductHideDialog
+            key={`product-hide-${currentRow.id}`}
+            open={open === 'hide'}
+            onOpenChange={() => {
+              setOpen('hide')
               setTimeout(() => {
                 setCurrentRow(null)
               }, 500)
