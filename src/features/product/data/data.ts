@@ -3,41 +3,29 @@ import {
   IconUserShield,
   IconUsersGroup,
   IconRefresh,
+  IconEyeOff,
 } from '@tabler/icons-react'
 import { ProductStatus } from './schema'
 
-export const callTypes = new Map<ProductStatus, string>([
-  [
-    'approved',
-    'bg-teal-100/30 text-teal-900 dark:text-teal-200 border-teal-200',
-  ],
-  [
-    'resubmitted',
-    'bg-yellow-100/30 text-yellow-900 dark:text-yellow-200 border-yellow-200',
-  ],
-  ['pending', 'bg-neutral-300/40 border-neutral-300'],
-  ['rejected', 'bg-sky-200/40 text-sky-900 dark:text-sky-100 border-sky-300'],
-])
+// The single source of truth for status filter options. Values must be exactly
+// what the API emits (see models.ProductStatus): a label-only mismatch here
+// silently filters nothing, which is how 'resubmit' hid every resubmission from
+// the moderators who most needed to find them.
+export const productStatuses: {
+  label: string
+  value: ProductStatus
+  icon: React.ComponentType<{ className?: string }>
+}[] = [
+  { label: 'Approved', value: 'approved', icon: IconShield },
+  { label: 'Pending', value: 'pending', icon: IconUserShield },
+  { label: 'Rejected', value: 'rejected', icon: IconUsersGroup },
+  { label: 'Resubmitted', value: 'resubmitted', icon: IconRefresh },
+  { label: 'Hidden', value: 'hidden', icon: IconEyeOff },
+]
 
-export const productStatus = [
-  {
-    label: 'Approved',
-    value: 'approved',
-    icon: IconShield,
-  },
-  {
-    label: 'Pending',
-    value: 'pending',
-    icon: IconUserShield,
-  },
-  {
-    label: 'Rejected',
-    value: 'rejected',
-    icon: IconUsersGroup,
-  },
-  {
-    label: 'Resubmit',
-    value: 'resubmit',
-    icon: IconRefresh,
-  },
-] as const
+// The review queue only ever holds these two, and calls a first submission
+// "New" - offering Approved or Rejected there filters to an empty table.
+export const queueStatuses = [
+  { ...productStatuses[1], label: 'New' },
+  productStatuses[3],
+]

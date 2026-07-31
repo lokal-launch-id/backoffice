@@ -27,6 +27,7 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { PaginationParams } from '../api/products-api'
 import { ProductQueueItem, PaginationMeta } from '../api/products-api'
+import { queueStatuses } from '../data/data'
 import { useProductQueue } from '../hooks/use-products'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableToolbar } from './data-table-toolbar'
@@ -137,7 +138,7 @@ function QueueTableInner({
 
   return (
     <div className='w-full space-y-4'>
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} statusOptions={queueStatuses} />
       <div className='rounded-md border'>
         <Table>
           <TableHeader>

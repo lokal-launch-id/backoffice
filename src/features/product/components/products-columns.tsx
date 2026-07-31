@@ -55,6 +55,9 @@ export const productsColumns: ColumnDef<Product>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
+    // Same as the queue: the faceted filter hands over an array of selected
+    // values, which the default matcher cannot compare against a string.
+    filterFn: (row, id, value: string[]) => value.includes(row.getValue(id)),
     meta: { className: '' },
   },
   {

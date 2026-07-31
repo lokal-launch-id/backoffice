@@ -44,6 +44,9 @@ export const queueColumns: ColumnDef<ProductQueueItem>[] = [
       ) : (
         <Badge variant='outline'>New</Badge>
       ),
+    // Without this the faceted filter's array of selected values reaches the
+    // default string matcher and filters everything out.
+    filterFn: (row, id, value: string[]) => value.includes(row.getValue(id)),
     meta: { className: '' },
   },
   {

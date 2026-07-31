@@ -2,15 +2,21 @@ import { Cross2Icon } from '@radix-ui/react-icons'
 import { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { productStatuses } from '../data/data'
 import { DataTableFacetedFilter } from './data-table-faceted-filter'
 import { DataTableViewOptions } from './data-table-view-options'
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
+  // Which statuses this table can actually contain. Defaults to all of them;
+  // the review queue passes its own two, since offering the rest there filters
+  // to an empty table.
+  statusOptions?: typeof productStatuses
 }
 
 export function DataTableToolbar<TData>({
   table,
+  statusOptions = productStatuses,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
@@ -30,11 +36,7 @@ export function DataTableToolbar<TData>({
             <DataTableFacetedFilter
               column={table.getColumn('status')}
               title='Status'
-              options={[
-                { label: 'Approved', value: 'approved' },
-                { label: 'Pending', value: 'pending' },
-                { label: 'Rejected', value: 'rejected' },
-              ]}
+              options={statusOptions}
             />
           )}
         </div>
