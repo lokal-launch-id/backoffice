@@ -46,8 +46,14 @@ export interface PaginationParams {
 export interface ProductQueueItem {
   id: string
   name_en: string
+  // Only 'pending' or 'resubmitted' reach the queue. A resubmission is a maker's
+  // fix after a rejection, so it comes with moderation history explaining what
+  // was wrong.
+  status: 'pending' | 'resubmitted'
   created_at: string
   user_id: string
+  // Days waiting in the current review cycle: for a resubmission the clock
+  // restarts at the edit, not at the original submission.
   days_in_queue: number
 }
 

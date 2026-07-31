@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { Link } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
+import { Badge } from '@/components/ui/badge'
 import { ProductQueueItem } from '../api/products-api'
 
 function QueueProductNameCell({ item }: { item: ProductQueueItem }) {
@@ -27,6 +28,22 @@ export const queueColumns: ColumnDef<ProductQueueItem>[] = [
     accessorKey: 'name_en',
     header: 'Product Name',
     cell: ({ row }) => <QueueProductNameCell item={row.original} />,
+    meta: { className: '' },
+  },
+  {
+    accessorKey: 'status',
+    header: 'Type',
+    // A resubmission is a second look at something already reviewed once, so it
+    // reads differently from a first submission: the moderator should open the
+    // product's moderation history before deciding.
+    cell: ({ row }) =>
+      row.original.status === 'resubmitted' ? (
+        <Badge variant='secondary' title='Edited by the maker after a rejection'>
+          Resubmitted
+        </Badge>
+      ) : (
+        <Badge variant='outline'>New</Badge>
+      ),
     meta: { className: '' },
   },
   {
