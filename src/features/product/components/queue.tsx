@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
+  OnChangeFn,
   SortingState,
   VisibilityState,
   flexRender,
@@ -25,7 +26,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { PaginationParams } from '../api/products-api'
+import { PaginationParams, QueueStatus } from '../api/products-api'
 import { ProductQueueItem, PaginationMeta } from '../api/products-api'
 import { queueStatuses } from '../data/data'
 import { useProductQueue } from '../hooks/use-products'
@@ -39,8 +40,12 @@ export default function ProductQueue() {
     pageSize: 10,
     limit: 10,
   })
+  // The status filter lives here, not inside the table: the table only holds
+  // one page, so filtering there would only ever find the resubmissions that
+  // happened to be on the page in front of you. The API does the filtering.
+  const [statuses, setStatuses] = useState<QueueStatus[]>([])
 
-  const { data, isLoading, error } = useProductQueue(pagination)
+  const { data, isLoading, error } = useProductQueue(pagination, statuses)
 
   const handlePageChange = (page: number) => {
     setPagination((prev) => ({ ...prev, page }))
@@ -48,6 +53,13 @@ export default function ProductQueue() {
 
   const handlePageSizeChange = (pageSize: number) => {
     setPagination({ page: 1, pageSize, limit: pagination.limit })
+  }
+
+  // A narrower queue has fewer pages, so page 3 of the old filter is usually
+  // past the end of the new one.
+  const handleStatusesChange = (next: QueueStatus[]) => {
+    setStatuses(next)
+    setPagination((prev) => ({ ...prev, page: 1 }))
   }
 
   return (
@@ -83,6 +95,8 @@ export default function ProductQueue() {
               columns={queueColumns}
               data={data.data}
               meta={data.meta}
+              statuses={statuses}
+              onStatusesChange={handleStatusesChange}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
             />
@@ -99,6 +113,8 @@ interface QueueTableInnerProps {
   columns: ColumnDef<ProductQueueItem>[]
   data: ProductQueueItem[]
   meta: PaginationMeta
+  statuses: QueueStatus[]
+  onStatusesChange: (statuses: QueueStatus[]) => void
   onPageChange: (page: number) => void
   onPageSizeChange: (pageSize: number) => void
 }
@@ -107,13 +123,39 @@ function QueueTableInner({
   columns,
   data,
   meta,
+  statuses,
+  onStatusesChange,
   onPageChange,
   onPageSizeChange,
 }: QueueTableInnerProps) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  // Every filter except status, which the API owns.
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState<SortingState>([])
+
+  // The toolbar reads and writes the status filter through the table, so the
+  // parent's selection is mirrored in as table state and any change to it is
+  // handed back out rather than being applied to the rows on this page.
+  const effectiveFilters: ColumnFiltersState = statuses.length
+    ? [...columnFilters, { id: 'status', value: statuses }]
+    : columnFilters
+
+  const handleColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (
+    updater
+  ) => {
+    const next =
+      typeof updater === 'function' ? updater(effectiveFilters) : updater
+    const nextStatuses =
+      (next.find((f) => f.id === 'status')?.value as QueueStatus[]) ?? []
+    if (
+      nextStatuses.length !== statuses.length ||
+      nextStatuses.some((s) => !statuses.includes(s))
+    ) {
+      onStatusesChange(nextStatuses)
+    }
+    setColumnFilters(next.filter((f) => f.id !== 'status'))
+  }
 
   const table = useReactTable({
     data,
@@ -122,12 +164,12 @@ function QueueTableInner({
       sorting,
       columnVisibility,
       rowSelection,
-      columnFilters,
+      columnFilters: effectiveFilters,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: handleColumnFiltersChange,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),

@@ -43,13 +43,14 @@ export interface PaginationParams {
   limit?: number
 }
 
+// Only these two reach the queue. A resubmission is a maker's fix after a
+// rejection, so it comes with moderation history explaining what was wrong.
+export type QueueStatus = 'pending' | 'resubmitted'
+
 export interface ProductQueueItem {
   id: string
   name_en: string
-  // Only 'pending' or 'resubmitted' reach the queue. A resubmission is a maker's
-  // fix after a rejection, so it comes with moderation history explaining what
-  // was wrong.
-  status: 'pending' | 'resubmitted'
+  status: QueueStatus
   created_at: string
   user_id: string
   // Days waiting in the current review cycle: for a resubmission the clock
@@ -146,8 +147,11 @@ export class ProductsApi {
     })
   }
 
+  // statuses narrows the queue server-side, so it covers every page rather than
+  // whichever one the moderator is looking at. Empty means the whole queue.
   static async getPendingQueue(
-    params?: PaginationParams
+    params?: PaginationParams,
+    statuses?: QueueStatus[]
   ): Promise<ProductQueueResponse> {
     const searchParams = new URLSearchParams()
     if (params?.page) {
@@ -158,6 +162,9 @@ export class ProductsApi {
     }
     if (params?.limit) {
       searchParams.append('limit', params.limit.toString())
+    }
+    if (statuses?.length) {
+      searchParams.append('status', statuses.join(','))
     }
     const endpoint =
       '/moderator/products/pending-queue' +

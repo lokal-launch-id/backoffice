@@ -7,6 +7,7 @@ import {
   deleteProduct,
   PaginationParams,
   ProductsRequest,
+  QueueStatus,
   updateProductStatus,
   getPendingQueue,
   getModerationHistory,
@@ -120,10 +121,15 @@ export const useProductDecision = () => {
   })
 }
 
-export const useProductQueue = (pagination?: PaginationParams) => {
+export const useProductQueue = (
+  pagination?: PaginationParams,
+  statuses?: QueueStatus[]
+) => {
   return useQuery({
-    queryKey: ['product-queue', pagination],
-    queryFn: () => getPendingQueue(pagination),
+    // The status filter is part of the request, so it has to be part of the
+    // cache key - otherwise a filtered page is served from the unfiltered one.
+    queryKey: ['product-queue', pagination, statuses],
+    queryFn: () => getPendingQueue(pagination, statuses),
   })
 }
 
